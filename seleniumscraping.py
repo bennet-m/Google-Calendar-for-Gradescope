@@ -89,13 +89,13 @@ print("HTML Source Collected")
 courseList = driver.find_element(By.CLASS,'courseList--term')
 courses = courseList.find_elements(By.CLASS, 'courseBox')
 
-courseURLs=[tag['href'] for tag in courses]
+courseURLs=[tag.get_attribute('href') for tag in courses]
 
 html_content = courses.page_source
 coursesSoup = BeautifulSoup(html_content, 'html.parser')
 print(coursesSoup)
 
-##Garbage belowI think
+##Garbage below I think
 #courseUrls = [tag['href'] for tag in courses]
 #rint(courseUrls)
 
