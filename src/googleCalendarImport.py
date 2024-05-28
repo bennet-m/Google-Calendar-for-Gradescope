@@ -20,7 +20,7 @@ def main():
   # time.
   if os.path.exists("token.json"):
     creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
+  # If there are no (valid) token available, let the user log in.
   if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
       print("Refreshing token")
@@ -32,10 +32,32 @@ def main():
       creds = flow.run_local_server(port=0)
     # Save the credentials for the next run
     with open("token.json", "w") as token:
-      token.write(creds.to_json())
+      token.write(creds.to_json())  
+
 
   try:
     service = build("calendar", "v3", credentials=creds)
+    print("running")
+    # Check if the Gradescope calendar exists, if not create it
+    page_token = None
+    gradescopeCalExists = False
+    while True:
+      calendar_list = service.calendarList().list(pageToken=page_token).execute()
+      for calendar_list_entry in calendar_list['items']:
+        if calendar_list_entry['summary'] == 'Gradescope Assignments':
+          gradescopeCalExists = True
+          id = calendar_list_entry['id']
+          break
+      page_token = calendar_list.get('nextPageToken')
+      if not page_token:
+        break
+      
+    if not gradescopeCalExists:
+      calendar = {
+        'summary': 'Gradescope Assignments',
+      }   
+      created_calendar = service.calendars().insert(body=calendar).execute()
+      id = created_calendar['id']
 
     # Call scraping function to get events and insert them into the calendar
     events = scraping()
