@@ -35,10 +35,11 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['images/logo.png'],
 )
 app = BUNDLE(
     exe,
     name='gradeSync.app',
-    icon=None,
+    icon='images/logo.png',
     bundle_identifier=None,
 )
