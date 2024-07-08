@@ -44,8 +44,6 @@ def scraping():
     service = ChromeService(executable_path=ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.delete_all_cookies()
-    purdueUser = "chen4007@purdue.edu"
-    purduePassword = "bennetbennet"
     def login():
         def purdueLogin():
             print("going to Purdue login page")
