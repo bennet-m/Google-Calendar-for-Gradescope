@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="icon" href="images/logo.png" type="image/png">
+        <title>GradeSync</title>
+    </head>
+        <meta name="google-site-verification" content="X7mWPpIUqJTSjCmTO0GU6mjL5CAl7Vfi6XBdDLYCaUQ" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(135deg, #23a8e1 0%, #0d4999 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: #007BFF;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 14px 20px;
+            text-align: center;
+        }
+        .navbar a:hover {
+            background-color: #0056b3;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 90%;
+            width: 450px;
+        }
+        img {
+            width: 100px;
+            height: 100px;
+        }
+        h1 {
+            margin: 10px 0;
+        }
+        p {
+            margin: 20px 0;
+        }
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .button {
+            display: block;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        @media (min-width: 600px) {
+            .buttons {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="./index.html">Download</a>
+        <a href="./about.html">About</a>
+        <a href="account.html">Account Setup</a>
+    </div>
+    <div class="container">
+        <img src="logo.png" alt="Icon">
+        <h1>Download GradeSync</h1>
+        <p>GradeSync will seamlessly add your Gradescope due dates to your Google Calendar</p>
+        <div class="buttons">
+            <a href="./dist/GradesyncWin.exe" class="button">Download for Windows</a>
+            <a href="./dist/GradeSync" class="button">Download for Mac</a>
+        </div>
+    </div>
+</body>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7859634981626634"
+     crossorigin="anonymous"></script>
+</html>

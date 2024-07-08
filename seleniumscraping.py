@@ -6,116 +6,259 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
-from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
+from uI import *
 import pickle
 import os
+import tempfile
 
+import tkinter as tk
+from tkinter import messagebox
 
-#Create Web Driver
-service = ChromeService(executable_path=ChromeDriverManager().install())
-driver = webdriver.Chrome(service=service)
+root = tk.Tk()
+root.geometry("300x200")
 
-def login():
-    print("going to login page")
-    driver.get("https://www.gradescope.com/auth/saml/hmc")
-    username = input("Enter your username: ")
-    password = input("Enter your password: ")
-    # Find the username and password fields once page loads sufficiently
-    username = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, "identification"))  
-    )
-    password = driver.find_element(By.ID, "ember533") 
+def scraping():
+    """
+    Scrapes Gradescope for assignments and returns them as a list of events.
 
-    # Submit credentials
-    username.send_keys(username)
-    password.send_keys(password)
-    password.send_keys(Keys.RETURN)
+    Returns:
+        (arr): An array of event dictionaries formated for the google calendar api
+    """
+    temp_dir = tempfile.mkdtemp()
+
     
-    
-# Load cookies if they exist
-if os.path.exists("cookies.pkl"):
-    print("Cookies exist, going to gradescope")
-    driver.get("https://www.gradescope.com")  # Navigate to the root domain to set cookies
-    cookies = pickle.load(open("cookies.pkl", "rb"))
-    for cookie in cookies:
-        driver.add_cookie(cookie)
+    # Configure Chrome options to run in headless mode
+    chrome_options = webdriver.ChromeOptions()
+    # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
+    chrome_options.add_argument("--window-size=200,1080")  # Set window size
+    chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+    chrome_options.add_argument("--remote-debugging-port=9222")  # Enable remote debugging
+    chrome_options.add_argument(f"--user-data-dir={temp_dir}")
 
-    print("refreshing")
-    driver.refresh()  # Refresh to apply cookies to the current session
+    #Create Web Driver
+    service = ChromeService(executable_path=ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.delete_all_cookies()
+    purdueUser = "chen4007@purdue.edu"
+    purduePassword = "bennetbennet"
+    def login():
+        def purdueLogin():
+            print("going to Purdue login page")
+            driver.get("https://www.gradescope.com/login")
+            # clientUsername = input("Enter your username: ")
+            # clientPassword = input("Enter your password: ")
+            # Find the username and password fields once page loads sufficiently
+            username = WebDriverWait(driver, 500).until(
+                EC.element_to_be_clickable((By.ID, "session_email"))  
+            )
+            password = driver.find_element(By.ID, "session_password")
+            print("logging in", clientUsername, clientPassword)
+            username.send_keys(clientUsername)
+            password.send_keys(clientPassword)
+            password.send_keys(Keys.RETURN)
+
+            
+        def muddLogin():
+            print("going to muddLogin page")
+            driver.get("https://www.gradescope.com/auth/saml/hmc")
+            # Find the username and password fields once page loads sufficiently
+            username = WebDriverWait(driver, 500).until(
+                EC.element_to_be_clickable((By.ID, "identification"))  
+            )
+            password = driver.find_element(By.ID, "ember533") 
+
+            # Submit credentials
+            username.send_keys(clientUsername)
+            password.send_keys(clientPassword)
+            password.send_keys(Keys.RETURN)
+
+            #Mudd login notice
+            messagebox.showinfo("Notice", "Sending Duo Push")
+
+            #Trust duo push
+            WebDriverWait(driver, 30).until(
+            EC.element_to_be_clickable((By.ID, "trust-browser-button"))
+            )
+            driver.find_element((By.ID, "trust-browser-button")).click()
+            
+        school, clientUsername, clientPassword = ui()
+        if school == "Harvey Mudd College":
+            muddLogin()
+        else:
+            purdueLogin()
+
+    def assignmentElementToEvent(assignment, course, defaultHref):
+        '''
+        Converts an assignment element to an event dictionary.
+
+        Args:
+            assignment: The assignment html element 
+            course:     Name of the course we're searching in
+
+        Returns:
+            event: A dictionary with all the relevent data from the assignment and formating data for the google calendar api
+                (course name, assignment name, assignment link, due date)
+        '''
+        #get the assignment name and href
+        assignmentPrimary = assignment.find_element(By.CLASS_NAME, "table--primaryLink")
+        assignmentName = assignmentPrimary.text
+        try:
+            assignmentHref = assignmentPrimary.find_element(By.TAG_NAME, "a").get_attribute("href")
+        except:
+            assignmentHref = defaultHref
+        print("link should be", assignmentHref)
+        #get the assignmentDue Date
+        try:
+            dueDateElement = assignment.find_element(By.CLASS_NAME, "submissionTimeChart--dueDate")
+        except:
+            print("there's no due date for assignment {assignment}")
+            return
+        dueDateUnformatted = dueDateElement.get_attribute("datetime")
+
+        # Change Due Date format to Google Calendar's format
+        obj = datetime.strptime(dueDateUnformatted, '%Y-%m-%d %H:%M:%S %z')
+        dueDate = obj.strftime("%Y-%m-%d") + "T" + obj.strftime("%H:%M:%S") + obj.strftime("%z")[0:3] + ':' + obj.strftime("%z")[3:5]
+
+        # Create a start date 30 minutes before the assignment is due
+        startDateObj = obj - timedelta(minutes=30)
+        startDate = startDateObj.strftime("%Y-%m-%d") + "T" + startDateObj.strftime("%H:%M:%S") + startDateObj.strftime("%z")[0:3] + ':' + startDateObj.strftime("%z")[3:5]
+
+        event = {
+            'summary': course,
+            'description': assignmentName + "\n" + assignmentHref,
+            'colorId': "7",
+            'start': {
+                'dateTime': startDate,
+            },
+            'end': {
+                'dateTime': dueDate,
+            },
+            'reminders': {
+                'useDefault': True,
+            },
+        }
+        print("event is", event)
+        return event
     
-    try:
+    def has_no_submission(assignment):
+            return "No Submission" in assignment.text
+
+    def assignmentScrape(href):
+        '''
+        Scrapes a Gradescope course page for assignments for the current user date
+        and organizes the data into an array of event dictionaries.
+
+        Args:
+            href (str): Gradescope course href string as an input
+
+        Returns:
+            (arr): An array of event dictionaries formated for the google calendar api
+        '''
+
+        if href == "https://www.gradescope.com":
+            return []
+        #get the course page
+        driver.get(href)
+
+        #wait for it to load
+        WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "courseHeader--title"))
+        )
+
+        #store the course title of the course page
+        course = driver.find_element(By.CLASS_NAME, "courseHeader--title").text
+
+        #find the assignment table
+        assignmentGrouped = driver.find_element(By.TAG_NAME,'tbody')
+
+        #Create a list of individual assingment elements
+        assignments = assignmentGrouped.find_elements(By.TAG_NAME, "tr")
+        print("Scraping Assignments on Course Page") 
+
+        #filter for assignments with No submissions
+        assignments = filter(lambda assignment: has_no_submission(assignment), assignments)
+        print("assignments filtered out now are ", assignments)
+
+
+        #Scrape data from each assignment and organize it
+        return [assignmentElementToEvent(assignment, course, href) for assignment in assignments]
+    
+
         
-        element = WebDriverWait(driver, 30).until(
+    # Load cookies if they exist
+    if os.path.exists("cookies.pkl"):
+        print("Cookies exist, going to gradescope")
+        # If you have cookies, go to the gradescope, load cookies, refresh and you should be logged in
+        driver.get("https://www.gradescope.com")  
+        cookies = pickle.load(open("cookies.pkl", "rb"))
+        for cookie in cookies:
+            driver.add_cookie(cookie)
+        print("refreshing")
+        driver.refresh()  
+        
+        #Check if you loaded into gradescope successfully
+        try:
+            WebDriverWait(driver, 30).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
+            )
+            print("we in gradescope")
+            
+        except TimeoutException:
+            print("Need to muddLogin")
+            
+            login()
+            WebDriverWait(driver, 30).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
+            )
+            print("Homepage Loaded")   
+
+    #no cookies need to log in        
+    else:
+        print("No cookies found, going to login ")
+        login()
+
+        WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
         )
-        # If the element is found, perform some action
-        print("we in gradescope")
+        print("Homepage Loaded")
+    # Save cookies to a file (For DuoPush)
+    driver.implicitly_wait(10)
+    pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
+    print("Cookies Saved")
+
+    
+
+
+    #Search for the first course list and make sure it is not an instructor course list
+    if not ("Instructor Courses" in driver.find_element(By.ID, "account-show" ).text):
+        #If it is not an instructor course list then the first instance of the courseList is a student sourse list
+        #find the student course list
+        courseList = driver.find_element(By.CLASS_NAME,'courseList--coursesForTerm')
+    else:
+        #if the fist courseList was an instructor course list use the second one which is a student course list
+        courseLists = driver.find_elements(By.CLASS_NAME,'courseList')
+        courseList = courseLists[1].find_element(By.CLASS_NAME,'courseList--coursesForTerm')
+
+    print("courseList is", courseList)
+
+    #Find all course boxes in the student course list
+    courses = courseList.find_elements(By.CLASS_NAME, 'courseBox')
+
+    #extract the course links from the course boxes
+    print("courses are", courses)
+    courseUrls = [elem.get_attribute("href") for elem in courses]
+
+    #Create an event dictionary for each course
+    data = []
+    for href in courseUrls:
+        print("course href is", href)
+        if href:
+            data.extend(assignmentScrape(href))
         
-    except TimeoutException:
-        print("Need to login")
-        
-        login()
-        WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))  # Adjust based on expected element on the next page
-        )
-        print("Homepage Loaded bitch")     
-else:
-    print("No cookies found, going to login ")
-    login()
-    # Wait for the next page or interaction to complete
-    WebDriverWait(driver, 30).until(
-        EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))  # Adjust based on expected element on the next page
-    )
-    print("Homepage Loaded")
-
-# Save cookies to a file (For DuoPush)
-driver.implicitly_wait(10)
-
-pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
-print("Cookies Saved")
-
-# Retrieve and print the HTML content of the page
-html_content = driver.page_source
-soup = BeautifulSoup(html_content, 'html.parser')
-print("HTML Source Collected")
-
-#search for the most recent courseList
-#courseList = soup.find('div', class_='courseList--term')
-#print courseList
-
-#courses = courseList.find_all("a", class_='courseBox')
-
-courseList = driver.find_element(By.CLASS,'courseList--term')
-courses = courseList.find_elements(By.CLASS, 'courseBox')
-
-courseURLs=[tag.get_attribute('href') for tag in courses]
-
-html_content = courses.page_source
-coursesSoup = BeautifulSoup(html_content, 'html.parser')
-print(coursesSoup)
-
-##Garbage below I think
-#courseUrls = [tag['href'] for tag in courses]
-#rint(courseUrls)
-
-# print("tags are", tags, "\n\n\n")
-# urls = [tag['href'] for tag in tags]
-# print(type(urls))
-
-
-# course = locate_with(By.TEXT, "input").below({By.CLASS_NAME: "courseList--term"})
-# print(course)
-
-# Use a more accurate XPath to target the course links under 'Spring 2024'
-# Adjust the XPath to select the following sibling of the div that contains "Spring 2024" which actually holds the course links.
-
-
-
-#course_links = driver.find_elements(By.XPATH, "//div[contains(text(), 'Student Courses')]/following::div[contains(text(),'Spring 2024')]/following-sibling::div[1]//a")
-
-# Extract href attributes
-#hrefs = [link.get_attribute('href') for link in course_links]
-
-# Print or process the links
-#print(hrefs)
+    print("FINAL OUTPUT YAY", data)
+    return data
