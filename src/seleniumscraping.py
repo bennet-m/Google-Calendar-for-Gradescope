@@ -71,7 +71,8 @@ def scraping():
             password.send_keys(Keys.RETURN)
             
             #Notify the user about the Duo Push
-            messagebox.showinfo("Notice", "Duo Push Sent - Click Ok to Continue")
+            messagebox.showinfo("Notice", "Duo Push Sent - Click OK to Continue")
+            
             
             #Trust duo push
             try:
