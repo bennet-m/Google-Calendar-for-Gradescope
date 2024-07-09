@@ -179,7 +179,7 @@ def scraping():
 
         #Scrape data from each assignment and organize it
         return [assignmentElementToEvent(assignment, course, href) for assignment in assignments]
-    
+
 
         
     # Load cookies if they exist
@@ -213,18 +213,11 @@ def scraping():
     else:
         print("No cookies found, going to login ")
         login()
-
-        WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
-        )
-        print("Homepage Loaded")
+    
     # Save cookies to a file (For DuoPush)
     driver.implicitly_wait(10)
     pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
     print("Cookies Saved")
-
-    
-
 
     #Search for the first course list and make sure it is not an instructor course list
     if not ("Instructor Courses" in driver.find_element(By.ID, "account-show" ).text):
