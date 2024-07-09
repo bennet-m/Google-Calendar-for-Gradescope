@@ -1,3 +1,4 @@
+from webbrowser import Error
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -13,12 +14,6 @@ from uI import *
 import pickle
 import os
 import tempfile
-
-import tkinter as tk
-from tkinter import messagebox
-
-root = tk.Tk()
-root.geometry("300x200")
 
 def scraping():
     """
@@ -59,7 +54,6 @@ def scraping():
             username.send_keys(clientUsername)
             password.send_keys(clientPassword)
             password.send_keys(Keys.RETURN)
-
             
         def muddLogin():
             print("going to muddLogin page")
@@ -74,16 +68,16 @@ def scraping():
             username.send_keys(clientUsername)
             password.send_keys(clientPassword)
             password.send_keys(Keys.RETURN)
-
-            #Mudd login notice
-            messagebox.showinfo("Notice", "Sending Duo Push")
-
             #Trust duo push
-            WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.ID, "trust-browser-button"))
-            )
-            driver.find_element((By.ID, "trust-browser-button")).click()
-            
+            try:
+                trust = WebDriverWait(driver, 500).until(
+                    EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
+                )
+                print("ok found it")
+                trust.click()
+            except Error as e:
+                print("oops missed it", e)
+
         school, clientUsername, clientPassword = ui()
         if school == "Harvey Mudd College":
             muddLogin()
@@ -260,3 +254,4 @@ def scraping():
         
     print("FINAL OUTPUT YAY", data)
     return data
+

@@ -102,20 +102,20 @@ def setup_cronjob():
 
 #Windows scheduler
 def setup_task_scheduler():
-    if sys.platform == "win32":
-        task_name = "GradescopeCalendar"
-        executable_path = get_self_path()
-        #run every 2 hrs
-        action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc hourly /mo 1 /f'
-        #run on start up
-        startUp_task_name = task_name + "Start"
-        action2 = f'schtasks /create /tn "{startUp_task_name}" /tr "{executable_path}" /sc onstart /f'
-        
-        subprocess.run(action1, shell=False)
-        subprocess.run(action2, shell=False)
+	task_name = "GradescopeCalendar"
+	executable_path = get_self_path()
+	#run every 2 hrs
+	action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc hourly /mo 1 /f'
+	#run on start up
+	startUp_task_name = task_name + "Start"
+	action2 = f'schtasks /create /tn "{startUp_task_name}" /tr "{executable_path}" /sc onstart /f'
+	
+	subprocess.run(action1, shell=False)
+	subprocess.run(action2, shell=False)
 
 if __name__ == "__main__":
 	if sys.platform in ["Linux", "darwin"]:
 		setup_cronjob()
-	setup_task_scheduler()
+	elif sys.platform == "win32":
+		setup_task_scheduler()
 	main()

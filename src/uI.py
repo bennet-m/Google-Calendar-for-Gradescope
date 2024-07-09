@@ -106,5 +106,3 @@ def ui():
     password = entry_values.get("password")
     
     return(school, username, password)
-
-ui()
