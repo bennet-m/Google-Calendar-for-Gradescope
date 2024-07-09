@@ -15,6 +15,7 @@ import pickle
 import os
 import tempfile
 
+
 def scraping():
     """
     Scrapes Gradescope for assignments and returns them as a list of events.
@@ -27,7 +28,7 @@ def scraping():
     
     # Configure Chrome options to run in headless mode
     chrome_options = webdriver.ChromeOptions()
-    # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
     chrome_options.add_argument("--window-size=200,1080")  # Set window size
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
@@ -68,6 +69,10 @@ def scraping():
             username.send_keys(clientUsername)
             password.send_keys(clientPassword)
             password.send_keys(Keys.RETURN)
+            
+            #Notify the user about the Duo Push
+            messagebox.showinfo("Notice", "Duo Push Sent - Click Ok to Continue")
+            
             #Trust duo push
             try:
                 trust = WebDriverWait(driver, 500).until(
