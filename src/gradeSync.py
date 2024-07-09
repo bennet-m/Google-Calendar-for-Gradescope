@@ -80,12 +80,14 @@ def main():
 	except HttpError as error:
 		print(f"An error occurred: {error}")
 
+#Scheduler
 def get_self_path():
 	if getattr(sys, 'frozen', False):
 		return sys.executable
 	else:
 		return os.path.abspath(__file__)
 
+#Mac Scheduler
 def setup_cronjob():
 	executable_path = get_self_path()
 	
@@ -98,6 +100,7 @@ def setup_cronjob():
 	else:
 		print("Cron job already exists.")
 
+#Windows scheduler
 def setup_task_scheduler():
     if sys.platform == "win32":
         task_name = "GradescopeCalendar"
