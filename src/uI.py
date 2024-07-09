@@ -89,7 +89,7 @@ def ui():
     # Function to handle forgot password
     def forgotPassword():
         # Open the website link in a web browser
-        webbrowser.open("https://https://gradesynccalendar.xyz/account.html")
+        webbrowser.open("https://gradesynccalendar.xyz/src/web/account.html")
 
     # Bind the forgot password link to the function
     forgot_password_link.bind("<Button-1>", lambda e: forgotPassword())
