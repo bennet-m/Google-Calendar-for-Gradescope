@@ -14,12 +14,6 @@ import pickle
 import os
 import tempfile
 
-import tkinter as tk
-from tkinter import messagebox
-
-root = tk.Tk()
-root.geometry("300x200")
-
 def scraping():
     """
     Scrapes Gradescope for assignments and returns them as a list of events.
@@ -44,6 +38,7 @@ def scraping():
     service = ChromeService(executable_path=ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.delete_all_cookies()
+    
     def login():
         def purdueLogin():
             print("going to Purdue login page")
@@ -74,15 +69,6 @@ def scraping():
             username.send_keys(clientUsername)
             password.send_keys(clientPassword)
             password.send_keys(Keys.RETURN)
-
-            #Mudd login notice
-            messagebox.showinfo("Notice", "Sending Duo Push")
-
-            #Trust duo push
-            WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.ID, "trust-browser-button"))
-            )
-            driver.find_element((By.ID, "trust-browser-button")).click()
             
         school, clientUsername, clientPassword = ui()
         if school == "Harvey Mudd College":
@@ -219,7 +205,6 @@ def scraping():
     else:
         print("No cookies found, going to login ")
         login()
-
         WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
         )
@@ -229,7 +214,11 @@ def scraping():
     pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
     print("Cookies Saved")
 
-    
+    WebDriverWait(driver, 30).until(
+        EC.element_to_be_clickable((By.ID, "trust-browser-button"))
+    )
+
+    driver.find_element((By.ID, "trust-browser-button")).click()
 
 
     #Search for the first course list and make sure it is not an instructor course list
