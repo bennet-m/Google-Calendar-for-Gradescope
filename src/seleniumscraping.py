@@ -14,6 +14,8 @@ from uI import *
 import pickle
 import os
 import tempfile
+import sys
+from pathlib import Path
 
 
 def scraping():
@@ -183,13 +185,20 @@ def scraping():
         return [assignmentElementToEvent(assignment, course, href) for assignment in assignments]
 
 
-        
+    
     # Load cookies if they exist
     if os.path.exists("cookies.pkl"):
         print("Cookies exist, going to gradescope")
         # If you have cookies, go to the gradescope, load cookies, refresh and you should be logged in
-        driver.get("https://www.gradescope.com")  
-        cookies = pickle.load(open("cookies.pkl", "rb"))
+        driver.get("https://www.gradescope.com")
+        if sys.platform in ["Linux", "darwin"]:
+            home_dir = Path.home()
+            cookie_path = home_dir / "cookies.pkl"
+            # token_path = "../__file__"
+        else:
+            token_path = "cookies.pkl"
+
+        cookies = pickle.load(open(cookie_path, "rb"))
         for cookie in cookies:
             driver.add_cookie(cookie)
         print("refreshing")
