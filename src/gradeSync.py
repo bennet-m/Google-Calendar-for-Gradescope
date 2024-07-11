@@ -17,6 +17,7 @@ def main():
 	"""Shows basic usage of the Google Calendar API.
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
+	creds = None
 	# Determine the base directory based on the operating system
 	if platform.system() == "Linux": #eww
 		base_dir = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / ".config"))
