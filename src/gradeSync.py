@@ -18,15 +18,15 @@ def main():
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
 	creds = None
-	# Determine the base directory based on the operating system
-	if platform.system() == "Linux": #eww
-		base_dir = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / ".config"))
-	elif platform.system() == "Darwin":  # macOS
-		base_dir = Path.home() / "Library" / "Application Support"
-	elif platform.system() == "Windows": #wndows
-		base_dir = "token.json"
+	# The file token.json stores the user's access and refresh tokens, and is
+	# created automatically when the authorization flow completes for the first
+	# time.
+	if sys.platform in ["Linux", "darwin"]:
+		home_dir = Path.home()
+		token_path = home_dir / "token.json"
+		# token_path = "../__file__"
 	else:
-		raise OSError("Unsupported operating system")
+		token_path = "token.json"
 
 	if os.path.exists("token.json"):
 		creds = Credentials.from_authorized_user_file("token.json", SCOPES)
@@ -40,7 +40,7 @@ def main():
 			flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
 			creds = flow.run_local_server(port=0)
 		# Save the credentials for the next run
-		with open(base_dir, "w") as token:
+		with open(token_path, "w") as token:
 			token.write(creds.to_json())
 
 	try:

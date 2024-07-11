@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>gradeSync</string>
 	<key>CFBundleIconFile</key>
-	<string>icon-windowed.icns</string>
+	<string>logo.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>gradeSync</string>
 	<key>CFBundleInfoDictionaryVersion</key>
