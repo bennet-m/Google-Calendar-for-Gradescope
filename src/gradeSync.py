@@ -1,4 +1,4 @@
-import datetime
+from tkinter import messagebox
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -9,18 +9,24 @@ from secrets import config
 import os.path
 import sys
 import subprocess
-
-# If modifying these scopes, delete the file token.json.
+from pathlib import Path
+import platform
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 def main():
 	"""Shows basic usage of the Google Calendar API.
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
-	creds = None
-	# The file token.json stores the user's access and refresh tokens, and is
-	# created automatically when the authorization flow completes for the first
-	# time.
+	# Determine the base directory based on the operating system
+	if platform.system() == "Linux": #eww
+		base_dir = Path(os.getenv('XDG_CONFIG_HOME', Path.home() / ".config"))
+	elif platform.system() == "Darwin":  # macOS
+		base_dir = Path.home() / "Library" / "Application Support"
+	elif platform.system() == "Windows": #wndows
+		base_dir = "token.json"
+	else:
+		raise OSError("Unsupported operating system")
+
 	if os.path.exists("token.json"):
 		creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 	# If there are no (valid) token available, let the user log in.
@@ -33,7 +39,7 @@ def main():
 			flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
 			creds = flow.run_local_server(port=0)
 		# Save the credentials for the next run
-		with open("token.json", "w") as token:
+		with open(base_dir, "w") as token:
 			token.write(creds.to_json())
 
 	try:
@@ -74,7 +80,6 @@ def main():
 		for event in events:
 			if event:
 				event = service.events().insert(calendarId=id, body=event).execute()
-
 				print('Event created: %s' % (event.get('htmlLink')))
     # print("Not actually making events")
 	except HttpError as error:
@@ -109,7 +114,6 @@ def setup_task_scheduler():
 	#run on start up
 	startUp_task_name = task_name + "Start"
 	action2 = f'schtasks /create /tn "{startUp_task_name}" /tr "{executable_path}" /sc onstart /f'
-	
 	subprocess.run(action1, shell=False)
 	subprocess.run(action2, shell=False)
 

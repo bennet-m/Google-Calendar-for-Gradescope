@@ -24,18 +24,13 @@ def scraping():
         (arr): An array of event dictionaries formated for the google calendar api
     """
     temp_dir = tempfile.mkdtemp()
-
-    
     # Configure Chrome options to run in headless mode
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-    chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
-    chrome_options.add_argument("--window-size=200,1080")  # Set window size
+    # # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument("--remote-debugging-port=9222")  # Enable remote debugging
     chrome_options.add_argument(f"--user-data-dir={temp_dir}")
-
     #Create Web Driver
     service = ChromeService(executable_path=ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -85,6 +80,7 @@ def scraping():
                 print("oops missed it", e)
 
         school, clientUsername, clientPassword = ui()
+
         if school == "Harvey Mudd College":
             muddLogin()
         else:
