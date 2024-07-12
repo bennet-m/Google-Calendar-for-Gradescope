@@ -106,3 +106,13 @@ def ui():
     password = entry_values.get("password")
     
     return(school, username, password)
+
+def duo():
+    root = tk.Tk()
+    root.withdraw()
+    root.title("Duo Authentication")
+    root.geometry("300x200")
+
+    messagebox.showinfo("Duo Authentication", "Check for a Duo!")
+
+    root.mainloop()

@@ -16,6 +16,8 @@ import os
 import tempfile
 import sys
 from pathlib import Path
+import tkinter as tk
+from tkinter import messagebox
 
 
 def scraping():
@@ -68,8 +70,7 @@ def scraping():
             password.send_keys(Keys.RETURN)
             
             #Notify the user about the Duo Push
-            messagebox.showinfo("Notice", "Duo Push Sent - Click OK to Continue")
-            
+            duo()            
             
             #Trust duo push
             try:
@@ -183,20 +184,17 @@ def scraping():
 
         #Scrape data from each assignment and organize it
         return [assignmentElementToEvent(assignment, course, href) for assignment in assignments]
-
-
-    
+    if sys.platform in ["Linux", "darwin"]:
+        home_dir = Path.home()
+        cookie_path = home_dir / "cookies.pkl"
+        # token_path = "../__file__"
+    else:
+        cookie_path = "cookies.pkl"
     # Load cookies if they exist
     if os.path.exists("cookies.pkl"):
         print("Cookies exist, going to gradescope")
         # If you have cookies, go to the gradescope, load cookies, refresh and you should be logged in
         driver.get("https://www.gradescope.com")
-        if sys.platform in ["Linux", "darwin"]:
-            home_dir = Path.home()
-            cookie_path = home_dir / "cookies.pkl"
-            # token_path = "../__file__"
-        else:
-            token_path = "cookies.pkl"
 
         cookies = pickle.load(open(cookie_path, "rb"))
         for cookie in cookies:
@@ -227,7 +225,7 @@ def scraping():
     
     # Save cookies to a file (For DuoPush)
     driver.implicitly_wait(10)
-    pickle.dump(driver.get_cookies(), open("cookies.pkl", "wb"))
+    pickle.dump(driver.get_cookies(), open(cookie_path, "wb"))
     print("Cookies Saved")
 
     #Search for the first course list and make sure it is not an instructor course list
