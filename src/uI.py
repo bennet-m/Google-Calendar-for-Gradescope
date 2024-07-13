@@ -7,8 +7,8 @@ import base64
 from io import BytesIO
 
 entry_values = {}
-def ui():
 
+def ui():
     # Function to handle login
     def popUp():
         global entry_values
@@ -108,11 +108,4 @@ def ui():
     return(school, username, password)
 
 def duo():
-    root = tk.Tk()
-    root.withdraw()
-    root.title("Duo Authentication")
-    root.geometry("300x200")
-
-    messagebox.showinfo("Duo Authentication", "Check for a Duo!")
-
-    root.mainloop()
+    messagebox.showinfo("Duo Authentication", "Check for a Duo push")

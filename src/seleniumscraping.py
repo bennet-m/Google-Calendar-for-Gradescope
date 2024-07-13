@@ -69,12 +69,11 @@ def scraping():
             password.send_keys(clientPassword)
             password.send_keys(Keys.RETURN)
             
-            #Notify the user about the Duo Push
-            duo()            
-            
-            #Trust duo push
             try:
-                trust = WebDriverWait(driver, 500).until(
+                print("trying duo")
+                duo()  
+                print("looking for trust")
+                trust = WebDriverWait(driver, 30).until(
                     EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
                 )
                 print("ok found it")
@@ -256,4 +255,3 @@ def scraping():
         
     print("FINAL OUTPUT YAY", data)
     return data
-
