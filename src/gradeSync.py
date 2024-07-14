@@ -109,8 +109,9 @@ def setup_cronjob():
 #Windows scheduler
 def setup_task_scheduler():
 	task_name = "GradescopeCalendar"
-	executable_path = get_self_path()
-	#run every 2 hrs
+	executable_path = sys.argv[0]
+	print(executable_path)
+	#run every hour
 	action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc hourly /mo 1 /f'
 	#run on start up
 	startUp_task_name = task_name + "Start"
