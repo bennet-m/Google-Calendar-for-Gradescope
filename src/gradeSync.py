@@ -17,15 +17,16 @@ def main():
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
 	creds = None
-	# The file token.json stores the user's access and refresh tokens, and is
-	# created automatically when the authorization flow completes for the first
-	# time.
+	#Define the token path for the google calendar api
 	if sys.platform in ["Linux", "darwin"]:
 		token_path = get_path() / "token.json"
 	else:
 		token_path = "token.json"
 
-	if token_path.exists():
+	# The file token.json stores the user's access and refresh tokens, and is
+	# created automatically when the authorization flow completes for the first
+	# time.
+	if os.path.exists(token_path):
 		creds = Credentials.from_authorized_user_file(token_path, SCOPES)
 	# If there are no (valid) token available, let the user log in.
 	if not creds or not creds.valid:
@@ -45,19 +46,19 @@ def main():
 		print("running")
 		# Check if the Gradescope calendar exists, if not create it
 		page_token = None
-		gradescopeCalExists = False
+		grade_scope_cal_exists = False
 		while True:
 			calendar_list = service.calendarList().list(pageToken=page_token).execute()
 			for calendar_list_entry in calendar_list['items']:
 				if calendar_list_entry['summary'] == 'Gradescope Assignments':
-					gradescopeCalExists = True
+					grade_scope_cal_exists = True
 					id = calendar_list_entry['id']
 					break
 			page_token = calendar_list.get('nextPageToken')
 			if not page_token:
 				break
 
-		if not gradescopeCalExists:
+		if not grade_scope_cal_exists:
 			calendar = {
 				'summary': 'Gradescope Assignments',
 			}

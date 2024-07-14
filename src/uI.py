@@ -10,7 +10,7 @@ entry_values = {}
 
 def ui():
     # Function to handle login
-    def popUp():
+    def pop_up():
         global entry_values
         school = school_var.get()
         username = username_entry.get()
@@ -87,14 +87,14 @@ def ui():
     forgot_password_link.pack(pady=5)
 
     # Function to handle forgot password
-    def forgotPassword():
+    def forgot_password():
         # Open the website link in a web browser
         webbrowser.open("https://gradesynccalendar.xyz/src/web/account.html")
 
     # Bind the forgot password link to the function
-    forgot_password_link.bind("<Button-1>", lambda e: forgotPassword())
+    forgot_password_link.bind("<Button-1>", lambda e: forgot_password())
 
-    login_button = tk.Button(root, text="Login", command=popUp)
+    login_button = tk.Button(root, text="Login", command=pop_up)
     login_button.pack(pady=20)
 
     # Run the application
@@ -113,6 +113,15 @@ def duo():
     root.withdraw()
     root.update()
     messagebox.showinfo("Duo Authentication", "Check for a Duo push")
+    root.update()
+    root.destroy()
+    root.mainloop()
+    
+def incorrect_login():
+    root = tk.Tk()
+    root.withdraw()
+    root.update()
+    messagebox.showinfo("Incorrect Login", "Your Password and/or Username was incorrect.")
     root.update()
     root.destroy()
     root.mainloop()
