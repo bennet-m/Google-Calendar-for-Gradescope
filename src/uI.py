@@ -108,4 +108,10 @@ def ui():
     return(school, username, password)
 
 def duo():
+    root = tk.Tk()
+    root.withdraw()
+    root.update()
     messagebox.showinfo("Duo Authentication", "Check for a Duo push")
+    root.update()
+    root.destroy()
+    root.mainloop()
