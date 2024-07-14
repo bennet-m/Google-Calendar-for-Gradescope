@@ -88,7 +88,8 @@ def scraping():
             mudd_login(client_username, client_password)
         else:
            purdue_login(client_username, client_password)
-            
+     
+    #Work on Login Loop when password is wrong       
     #def login():
     #    while True:
     #        school, client_username, client_password = ui()

@@ -107,21 +107,20 @@ def ui():
     
     return(school, username, password)
 
+#pushes a Message to a User
+def message(title,text):
+    root = tk.Tk()
+    root.withdraw()
+    root.update()
+    messagebox.showinfo(title, text)
+    root.update()
+    root.destroy()
+    root.mainloop()
+
 #Notifies the User of a Duo popup when logging in with their HMC account
 def duo():
-    root = tk.Tk()
-    root.withdraw()
-    root.update()
-    messagebox.showinfo("Duo Authentication", "Check for a Duo push")
-    root.update()
-    root.destroy()
-    root.mainloop()
-    
+    message("Duo Authentication", "Check for a Duo push")
+
+#Incorrect login Notice
 def incorrect_login():
-    root = tk.Tk()
-    root.withdraw()
-    root.update()
-    messagebox.showinfo("Incorrect Login", "Your Password and/or Username was incorrect.")
-    root.update()
-    root.destroy()
-    root.mainloop()
+    message("Incorrect Login", "Your Password and/or Username was incorrect.")
