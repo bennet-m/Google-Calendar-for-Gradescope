@@ -73,7 +73,7 @@ def scraping():
             print("trying duo")
             duo()  
             print("looking for trust")
-            trust = WebDriverWait(driver, 30).until(
+            trust = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
             )
             print("ok found it")
@@ -81,25 +81,36 @@ def scraping():
         except Error as e:
             print("oops missed it", e)
     
-    #
-    def login():
-        school, client_username, client_password = ui()
-        if school == "Harvey Mudd College":
-            mudd_login(client_username, client_password)
-        else:
-           purdue_login(client_username, client_password)
-     
+        
     #Work on Login Loop when password is wrong       
-    #def login():
-    #    while True:
-    #        school, client_username, client_password = ui()
-    #        if school == "Harvey Mudd College":
-    #            mudd_login(client_username, client_password)
-    #            break  # Successful login, exit the loop
-    #        else:
-    #            purdue_login(client_username, client_password)
-    #            if 
-    #            break  # Successful login, exit the loop
+    def login():
+        while True:
+            school, client_username, client_password = ui()
+            if school == "Harvey Mudd College":
+                mudd_login(client_username, client_password)
+                try:
+                    print("testing to see if password is right")
+                    driver.find_element(By.CLASS_NAME, "courseList--term")
+                    
+                    print("Correct User Loggin")
+                    break
+                except:
+                    #Notify user of incorrect information
+                    incorrect_login()
+                    print("Incorrect User Info")
+                    
+            else:
+                purdue_login(client_username, client_password)
+                try:
+                    print("testing to see if password is right")
+                    driver.find_element(By.CLASS_NAME, "courseList--term")
+                    
+                    print("Correct User Loggin")
+                    break
+                except:
+                    #Notify user of incorrect information
+                    incorrect_login()
+                    print("Incorrect User Info")
             
 
     def assignmentElementToEvent(assignment, course, default_href):

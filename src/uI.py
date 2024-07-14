@@ -22,8 +22,8 @@ def ui():
 
         # Store values in the global dictionary
         entry_values = {"school": school, "username": username, "password": password}
-
-        # Destroy the root window
+        
+        #Remove the loggin UI
         root.destroy()
 
     # Autocomplete functionality for the Combobox
@@ -96,6 +96,13 @@ def ui():
 
     login_button = tk.Button(root, text="Login", command=pop_up)
     login_button.pack(pady=20)
+    
+    # Bind the Enter key to the login button
+    root.bind('<Return>', lambda event: 
+        login_button.invoke())
+    
+    
+        
 
     # Run the application
     root.mainloop()
