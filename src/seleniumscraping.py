@@ -39,54 +39,56 @@ def scraping():
     service = ChromeService(executable_path=ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.delete_all_cookies()
+    
+    
+    def purdueLogin(clientUsername, clientPassword):
+        print("going to Purdue login page")
+        driver.get("https://www.gradescope.com/login")
+        # clientUsername = input("Enter your username: ")
+        # clientPassword = input("Enter your password: ")
+        # Find the username and password fields once page loads sufficiently
+        username = WebDriverWait(driver, 500).until(
+            EC.element_to_be_clickable((By.ID, "session_email"))  
+        )
+        password = driver.find_element(By.ID, "session_password")
+        print("logging in", clientUsername, clientPassword)
+        username.send_keys(clientUsername)
+        password.send_keys(clientPassword)
+        password.send_keys(Keys.RETURN)
+            
+    def muddLogin(clientUsername, clientPassword):
+        print("going to muddLogin page")
+        driver.get("https://www.gradescope.com/auth/saml/hmc")
+        # Find the username and password fields once page loads sufficiently
+        username = WebDriverWait(driver, 500).until(
+            EC.element_to_be_clickable((By.ID, "identification"))  
+        )
+        password = driver.find_element(By.ID, "ember533") 
+
+        # Submit credentials
+        username.send_keys(clientUsername)
+        password.send_keys(clientPassword)
+        password.send_keys(Keys.RETURN)
+            
+        try:
+            print("trying duo")
+            duo()  
+            print("looking for trust")
+            trust = WebDriverWait(driver, 30).until(
+                EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
+            )
+            print("ok found it")
+            trust.click()
+        except Error as e:
+            print("oops missed it", e)
+    
+    #
     def login():
-        def purdueLogin():
-            print("going to Purdue login page")
-            driver.get("https://www.gradescope.com/login")
-            # clientUsername = input("Enter your username: ")
-            # clientPassword = input("Enter your password: ")
-            # Find the username and password fields once page loads sufficiently
-            username = WebDriverWait(driver, 500).until(
-                EC.element_to_be_clickable((By.ID, "session_email"))  
-            )
-            password = driver.find_element(By.ID, "session_password")
-            print("logging in", clientUsername, clientPassword)
-            username.send_keys(clientUsername)
-            password.send_keys(clientPassword)
-            password.send_keys(Keys.RETURN)
-            
-        def muddLogin():
-            print("going to muddLogin page")
-            driver.get("https://www.gradescope.com/auth/saml/hmc")
-            # Find the username and password fields once page loads sufficiently
-            username = WebDriverWait(driver, 500).until(
-                EC.element_to_be_clickable((By.ID, "identification"))  
-            )
-            password = driver.find_element(By.ID, "ember533") 
-
-            # Submit credentials
-            username.send_keys(clientUsername)
-            password.send_keys(clientPassword)
-            password.send_keys(Keys.RETURN)
-            
-            try:
-                print("trying duo")
-                duo()  
-                print("looking for trust")
-                trust = WebDriverWait(driver, 30).until(
-                    EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
-                )
-                print("ok found it")
-                trust.click()
-            except Error as e:
-                print("oops missed it", e)
-
         school, clientUsername, clientPassword = ui()
-
         if school == "Harvey Mudd College":
-            muddLogin()
+            muddLogin(clientUsername, clientPassword)
         else:
-            purdueLogin()
+            purdueLogin(clientUsername, clientPassword)
 
     def assignmentElementToEvent(assignment, course, defaultHref):
         '''
@@ -142,7 +144,7 @@ def scraping():
         return event
     
     def has_no_submission(assignment):
-            return "No Submission" in assignment.text
+        return "No Submission" in assignment.text
 
     def assignmentScrape(href):
         '''
