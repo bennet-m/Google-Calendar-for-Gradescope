@@ -82,7 +82,7 @@ def scraping():
             print("oops missed it", e)
     
         
-    #Work on Login Loop when password is wrong       
+    #Login loop      
     def login():
         while True:
             school, client_username, client_password = ui()

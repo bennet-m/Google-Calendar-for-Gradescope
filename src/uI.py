@@ -86,23 +86,21 @@ def ui():
     forgot_password_link = tk.Label(root, text="I login using \"School Credentials\" on Gradescope. What do I do?", cursor="hand1", font=("Arial", 10), underline=True)
     forgot_password_link.pack(pady=5)
 
-    # Function to handle forgot password
-    def forgot_password():
+    # Function to direct Users to the SSO Account Setup page
+    def sso_setup():
         # Open the website link in a web browser
         webbrowser.open("https://gradesynccalendar.xyz/src/web/account.html")
 
-    # Bind the forgot password link to the function
-    forgot_password_link.bind("<Button-1>", lambda e: forgot_password())
-
+    # Bind the SSO Account Setup page link to the function
+    forgot_password_link.bind("<Button-1>", lambda e: sso_setup())
+    
+    #create the loggin button and functionality
     login_button = tk.Button(root, text="Login", command=pop_up)
     login_button.pack(pady=20)
     
     # Bind the Enter key to the login button
     root.bind('<Return>', lambda event: 
         login_button.invoke())
-    
-    
-        
 
     # Run the application
     root.mainloop()
