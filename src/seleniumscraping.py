@@ -27,6 +27,9 @@ def scraping():
     Returns:
         (arr): An array of event dictionaries formated for the google calendar api
     """
+    
+    ##SETUP##
+    
     temp_dir = tempfile.mkdtemp()
     # Configure Chrome options to run in headless mode
     chrome_options = webdriver.ChromeOptions()
@@ -40,7 +43,7 @@ def scraping():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.delete_all_cookies()
     
-    
+    ##DEFINE FUNCTIONS##
     def purdueLogin(clientUsername, clientPassword):
         print("going to Purdue login page")
         driver.get("https://www.gradescope.com/login")
@@ -186,7 +189,7 @@ def scraping():
         #Scrape data from each assignment and organize it
         return [assignmentElementToEvent(assignment, course, href) for assignment in assignments]
     
-    
+    ##PROGRAM##
     if sys.platform in ["Linux", "darwin"]:
         home_dir = Path.home()
         cookie_path = home_dir / "cookies.pkl"
