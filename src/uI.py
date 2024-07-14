@@ -107,5 +107,6 @@ def ui():
     
     return(school, username, password)
 
+#Notifies the User of a Duo popup when logging in with their HMC account
 def duo():
     messagebox.showinfo("Duo Authentication", "Check for a Duo push")
