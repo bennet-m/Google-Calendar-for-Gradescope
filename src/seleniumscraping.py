@@ -16,9 +16,7 @@ import os
 import tempfile
 import sys
 from pathlib import Path
-import tkinter as tk
-from tkinter import messagebox
-
+from macPath import get_path
 
 def scraping():
     """
@@ -186,13 +184,12 @@ def scraping():
     
     
     if sys.platform in ["Linux", "darwin"]:
-        home_dir = Path.home()
-        cookie_path = home_dir / "cookies.pkl"
+        cookie_path = get_path() / "cookies.pkl"
         # token_path = "../__file__"
     else:
         cookie_path = "cookies.pkl"
     # Load cookies if they exist
-    if os.path.exists("cookies.pkl"):
+    if cookie_path.exists():
         print("Cookies exist, going to gradescope")
         # If you have cookies, go to the gradescope, load cookies, refresh and you should be logged in
         driver.get("https://www.gradescope.com")

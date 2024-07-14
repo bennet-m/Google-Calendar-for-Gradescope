@@ -9,8 +9,7 @@ from secrets import config
 import os.path
 import sys
 import subprocess
-from pathlib import Path
-import platform
+from macPath import get_path
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 def main():
@@ -22,14 +21,12 @@ def main():
 	# created automatically when the authorization flow completes for the first
 	# time.
 	if sys.platform in ["Linux", "darwin"]:
-		home_dir = Path.home()
-		token_path = home_dir / "token.json"
-		# token_path = "../__file__"
+		token_path = get_path() / "token.json"
 	else:
 		token_path = "token.json"
 
-	if os.path.exists("token.json"):
-		creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+	if token_path.exists():
+		creds = Credentials.from_authorized_user_file(token_path, SCOPES)
 	# If there are no (valid) token available, let the user log in.
 	if not creds or not creds.valid:
 		if creds and creds.expired and creds.refresh_token:
