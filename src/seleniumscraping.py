@@ -25,11 +25,9 @@ def scraping():
     Returns:
         (arr): An array of event dictionaries formated for the google calendar api
     """
-    
-    ##SETUP##
+
     
     temp_dir = tempfile.mkdtemp()
-    # Configure Chrome options to run in headless mode
     chrome_options = webdriver.ChromeOptions()
     # # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
@@ -42,23 +40,23 @@ def scraping():
     driver.delete_all_cookies()
     
     ##DEFINE FUNCTIONS##
-    def purdueLogin(clientUsername, clientPassword):
+    def purdue_login(client_username, client_password):
         print("going to Purdue login page")
         driver.get("https://www.gradescope.com/login")
-        # clientUsername = input("Enter your username: ")
-        # clientPassword = input("Enter your password: ")
+        # client_username = input("Enter your username: ")
+        # client_password = input("Enter your password: ")
         # Find the username and password fields once page loads sufficiently
         username = WebDriverWait(driver, 500).until(
             EC.element_to_be_clickable((By.ID, "session_email"))  
         )
         password = driver.find_element(By.ID, "session_password")
-        print("logging in", clientUsername, clientPassword)
-        username.send_keys(clientUsername)
-        password.send_keys(clientPassword)
+        print("logging in", client_username, client_password)
+        username.send_keys(client_username)
+        password.send_keys(client_password)
         password.send_keys(Keys.RETURN)
             
-    def muddLogin(clientUsername, clientPassword):
-        print("going to muddLogin page")
+    def mudd_login(client_username, client_password):
+        print("going to mudd_login page")
         driver.get("https://www.gradescope.com/auth/saml/hmc")
         # Find the username and password fields once page loads sufficiently
         username = WebDriverWait(driver, 500).until(
@@ -67,8 +65,8 @@ def scraping():
         password = driver.find_element(By.ID, "ember533") 
 
         # Submit credentials
-        username.send_keys(clientUsername)
-        password.send_keys(clientPassword)
+        username.send_keys(client_username)
+        password.send_keys(client_password)
         password.send_keys(Keys.RETURN)
             
         try:
@@ -85,13 +83,25 @@ def scraping():
     
     #
     def login():
-        school, clientUsername, clientPassword = ui()
+        school, client_username, client_password = ui()
         if school == "Harvey Mudd College":
-            muddLogin(clientUsername, clientPassword)
+            mudd_login(client_username, client_password)
         else:
-            purdueLogin(clientUsername, clientPassword)
+           purdue_login(client_username, client_password)
+            
+    #def login():
+    #    while True:
+    #        school, client_username, client_password = ui()
+    #        if school == "Harvey Mudd College":
+    #            mudd_login(client_username, client_password)
+    #            break  # Successful login, exit the loop
+    #        else:
+    #            purdue_login(client_username, client_password)
+    #            if 
+    #            break  # Successful login, exit the loop
+            
 
-    def assignmentElementToEvent(assignment, course, defaultHref):
+    def assignmentElementToEvent(assignment, course, default_href):
         '''
         Converts an assignment element to an event dictionary.
 
@@ -104,38 +114,38 @@ def scraping():
                 (course name, assignment name, assignment link, due date)
         '''
         #get the assignment name and href
-        assignmentPrimary = assignment.find_element(By.CLASS_NAME, "table--primaryLink")
-        assignmentName = assignmentPrimary.text
+        assignment_primary = assignment.find_element(By.CLASS_NAME, "table--primaryLink")
+        assignment_name = assignment_primary.text
         try:
-            assignmentHref = assignmentPrimary.find_element(By.TAG_NAME, "a").get_attribute("href")
+            assignment_href = assignment_primary.find_element(By.TAG_NAME, "a").get_attribute("href")
         except:
-            assignmentHref = defaultHref
-        print("link should be", assignmentHref)
+            assignment_href = default_href
+        print("link should be", assignment_href)
         #get the assignmentDue Date
         try:
-            dueDateElement = assignment.find_element(By.CLASS_NAME, "submissionTimeChart--dueDate")
+            due_date_element = assignment.find_element(By.CLASS_NAME, "submissionTimeChart--dueDate")
         except:
             print("there's no due date for assignment {assignment}")
             return
-        dueDateUnformatted = dueDateElement.get_attribute("datetime")
+        due_date_unformatted = due_date_element.get_attribute("datetime")
 
         # Change Due Date format to Google Calendar's format
-        obj = datetime.strptime(dueDateUnformatted, '%Y-%m-%d %H:%M:%S %z')
-        dueDate = obj.strftime("%Y-%m-%d") + "T" + obj.strftime("%H:%M:%S") + obj.strftime("%z")[0:3] + ':' + obj.strftime("%z")[3:5]
+        obj = datetime.strptime(due_date_unformatted, '%Y-%m-%d %H:%M:%S %z')
+        due_date = obj.strftime("%Y-%m-%d") + "T" + obj.strftime("%H:%M:%S") + obj.strftime("%z")[0:3] + ':' + obj.strftime("%z")[3:5]
 
         # Create a start date 30 minutes before the assignment is due
-        startDateObj = obj - timedelta(minutes=30)
-        startDate = startDateObj.strftime("%Y-%m-%d") + "T" + startDateObj.strftime("%H:%M:%S") + startDateObj.strftime("%z")[0:3] + ':' + startDateObj.strftime("%z")[3:5]
+        start_date_obj = obj - timedelta(minutes=30)
+        start_date = start_date_obj.strftime("%Y-%m-%d") + "T" + start_date_obj.strftime("%H:%M:%S") + start_date_obj.strftime("%z")[0:3] + ':' + start_date_obj.strftime("%z")[3:5]
 
         event = {
             'summary': course,
-            'description': assignmentName + "\n" + assignmentHref,
+            'description': assignment_name + "\n" + assignment_href,
             'colorId': "7",
             'start': {
-                'dateTime': startDate,
+                'dateTime': start_date,
             },
             'end': {
-                'dateTime': dueDate,
+                'dateTime': due_date,
             },
             'reminders': {
                 'useDefault': True,
@@ -147,7 +157,7 @@ def scraping():
     def has_no_submission(assignment):
         return "No Submission" in assignment.text
 
-    def assignmentScrape(href):
+    def assignment_scrape(href):
         '''
         Scrapes a Gradescope course page for assignments for the current user date
         and organizes the data into an array of event dictionaries.
@@ -173,10 +183,10 @@ def scraping():
         course = driver.find_element(By.CLASS_NAME, "courseHeader--title").text
 
         #find the assignment table
-        assignmentGrouped = driver.find_element(By.TAG_NAME,'tbody')
+        assignment_grouped = driver.find_element(By.TAG_NAME,'tbody')
 
         #Create a list of individual assingment elements
-        assignments = assignmentGrouped.find_elements(By.TAG_NAME, "tr")
+        assignments = assignment_grouped.find_elements(By.TAG_NAME, "tr")
         print("Scraping Assignments on Course Page") 
 
         #filter for assignments with No submissions
@@ -187,6 +197,7 @@ def scraping():
         #Scrape data from each assignment and organize it
         return [assignmentElementToEvent(assignment, course, href) for assignment in assignments]
     
+    
     ##PROGRAM##
     if sys.platform in ["Linux", "darwin"]:
         cookie_path = get_path() / "cookies.pkl"
@@ -194,7 +205,7 @@ def scraping():
     else:
         cookie_path = "cookies.pkl"
     # Load cookies if they exist
-    if cookie_path.exists():
+    if os.path.exists(cookie_path):
         print("Cookies exist, going to gradescope")
         # If you have cookies, go to the gradescope, load cookies, refresh and you should be logged in
         driver.get("https://www.gradescope.com")
@@ -213,7 +224,7 @@ def scraping():
             print("we in gradescope")
             
         except TimeoutException:
-            print("Need to muddLogin")
+            print("Need to mudd_login")
             
             login()
             WebDriverWait(driver, 30).until(
@@ -250,14 +261,14 @@ def scraping():
 
     #extract the course links from the course boxes
     print("courses are", courses)
-    courseUrls = [elem.get_attribute("href") for elem in courses]
+    course_urls = [elem.get_attribute("href") for elem in courses]
 
     #Create an event dictionary for each course
     data = []
-    for href in courseUrls:
+    for href in course_urls:
         print("course href is", href)
         if href:
-            data.extend(assignmentScrape(href))
+            data.extend(assignment_scrape(href))
         
     print("FINAL OUTPUT YAY", data)
     return data
