@@ -183,6 +183,8 @@ def scraping():
 
         #Scrape data from each assignment and organize it
         return [assignmentElementToEvent(assignment, course, href) for assignment in assignments]
+    
+    
     if sys.platform in ["Linux", "darwin"]:
         home_dir = Path.home()
         cookie_path = home_dir / "cookies.pkl"
@@ -223,7 +225,9 @@ def scraping():
         login()
     
     # Save cookies to a file (For DuoPush)
-    driver.implicitly_wait(10)
+    WebDriverWait(driver, 500).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
+            )
     pickle.dump(driver.get_cookies(), open(cookie_path, "wb"))
     print("Cookies Saved")
 
