@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
     <head>
         <link rel="icon" href="images/logo.png" type="image/png">
         <title>GradeSync</title>
@@ -18,7 +19,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow: auto;
         }
         .navbar {
             display: flex;
@@ -48,17 +49,20 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             max-width: 90%;
-            width: 450px;
-        }
-        img {
-            width: 100px;
-            height: 100px;
+            width: 60vw;
         }
         h1 {
             margin: 10px 0;
         }
+        h2 {
+            text-align: left;
+        }
         p {
             margin: 20px 0;
+        }
+        li {
+            text-align: left;
+            width: 75%;
         }
         .buttons {
             display: flex;
@@ -93,18 +97,95 @@
     <div class="navbar">
         <a href="index.html">Download</a>
         <a href="src/web/about.html">About</a>
-        <a href="src/web/account.html">Account Setup</a>
+        <a href="src/web/account.html">Logging in with "School Credentials"</a>
     </div>
-    <div class="container">
-        <img src="images/logo.png" alt="Icon">
+    <br>
+    <div class="container" style="margin-top: 70px" >
+        <img src="images/logo.png" alt="Icon" style="width: 100px">
         <h1>Download GradeSync</h1>
         <p>GradeSync will seamlessly add your Gradescope due dates to your Google Calendar</p>
         <div class="buttons">
-            <a href="dist/gradeSync.dmg" class="button">Download for Mac</a>
-            <a href="dist/GradeSyncWin.zip" class="button">Download for Windows</a>
+            <a id = "mac-download" href="dist/gradeSync.dmg" class="button">Download for Mac</a>
+            <a id = "windows-download" href="dist/GradeSyncWin.zip" class="button">Download for Windows</a>
         </div>
     </div>
+    <br>
+    <div class="container">
+        <h1>What does GradeSync do?</h1>
+        <p>
+            This application is designed to integrate Gradescope assignments seamlessly with your Google Calendar. By connecting your Gradescope account, the app will automatically sync your assignments, due dates, and deadlines directly to your Google Calendar. This ensures that you never miss an important assignment or deadline again.
+        </p>
+        <img src="images/sample.jpg" alt="Warning" style="width: 90%; height: auto"/>
+        <div id="mac-instructions">
+            <center>
+            <h1>How to set it up (Mac)</h1>
+            <ol>
+                <li><a id="mac-download" href="dist/gradeSync.dmg">Download here</a></li>
+                <li style="padding: 10px">
+                    <div style="display: flex; align-items: center;">
+                        <p style="margin: 0; flex: 1; line-height: 1.5">
+                            Open the app. If you see this warning, it's because the app is not from the App Store. Open the app by right-clicking on it and pressing "Open." You might have to do this step twice.
+                        </p>
+                        <img src="images/warning.png" style="height: 200px; margin-left: 10px;" alt="Warning">
+                    </div>
+                </li>
+                <li>If you want the app to run automatically, accept the popup asking to grant GradeSync access to administer your computer. If you disallow access, you'll have to run GradeSync yourself when you want your calendar to update.</li>
+                <li>Sign in to your Google account when prompted.</li>
+                <li>Sign into your Gradescope account when prompted. If you usually log in with "School Credentials" and don't go to Harvey Mudd, go <a href="src/web/account.html"> here</a> to enable logging in to Gradescope with email and password. </li>
+            </ol>
+            Done! Your Gradescope assignments will now be synced to your Google Calendar.
+            </center>
+        </div>
+        <div id="windows-instructions">
+            <h1>How to set it up (Windows)</h1>
+            <ol>
+                <li><a href="dist/GradeSyncWin.zip">Download here</a></li>
+                <li>Extract the downloaded file and run the executable inside.</li>
+                <li>Sign in to your Google account when prompted</li>
+                <li>Sign into your Gradescope account when prompted. If you usually log in with "School Credentials" and don't go to Harvey Mudd, go <a href="src/web/account.html"> here</a> enable logging in to Gradescope with email and password. </li>
+            </ol>
+            Done! Your Gradescope assignments will now be synced to your Google Calendar.
+        </div>
+    </div>
+
+    <br>
+
 </body>
+<script>
+    function getOS() {
+        let userAgent = window.navigator.userAgent,
+            platform = window.navigator?.userAgentData?.platform || window.navigator.platform,
+            macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K', 'Darwin'],
+            windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+            os = null;
+
+        if (macosPlatforms.indexOf(platform) !== -1 || /Mac OS X/.test(userAgent)) {
+            os = 'Mac';
+        } else if (windowsPlatforms.indexOf(platform) !== -1 || /Windows/.test(userAgent)) {
+            os = 'Windows';
+        } else if (/Linux/.test(platform)) {
+            os = 'Linux';
+        }
+
+        return os;
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        let os = getOS();
+
+        if (os === 'Mac') {
+            console.log("Operating system detected as Mac")
+            document.getElementById('windows-download').style.display = 'none';
+            document.getElementById('windows-instructions').style.display = 'none';
+        } else if (os === 'Windows') {
+            console.log("Operating system detected as Windows")
+            document.getElementById('mac-download').style.display = 'none';
+            document.getElementById('mac-instructions').style.display = 'none';
+        } else {
+            console.log("Operating system not recognized")
+        }
+    });
+</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7859634981626634"
     crossorigin="anonymous"></script>
 </html>

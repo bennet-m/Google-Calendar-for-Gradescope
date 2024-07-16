@@ -95,7 +95,7 @@ def get_self_path():
 def setup_cronjob():
 	executable_path = get_self_path()
 	
-	cron_job = f"0 */2 * * * {executable_path}\n"
+	cron_job = f"0 * * * * {executable_path}\n"
 	current_cron_jobs = os.popen('crontab -l').read()
 
 	if cron_job not in current_cron_jobs:

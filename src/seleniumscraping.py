@@ -25,14 +25,12 @@ def scraping():
     Returns:
         (arr): An array of event dictionaries formated for the google calendar api
     """
-
     
     temp_dir = tempfile.mkdtemp()
     chrome_options = webdriver.ChromeOptions()
-    # # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-    chrome_options.add_argument("--remote-debugging-port=9222")  # Enable remote debugging
     chrome_options.add_argument(f"--user-data-dir={temp_dir}")
     #Create Web Driver
     service = ChromeService(executable_path=ChromeDriverManager().install())
@@ -43,8 +41,6 @@ def scraping():
     def purdue_login(client_username, client_password):
         print("going to Purdue login page")
         driver.get("https://www.gradescope.com/login")
-        # client_username = input("Enter your username: ")
-        # client_password = input("Enter your password: ")
         # Find the username and password fields once page loads sufficiently
         username = WebDriverWait(driver, 500).until(
             EC.element_to_be_clickable((By.ID, "session_email"))  
@@ -81,25 +77,12 @@ def scraping():
         except Error as e:
             print("oops missed it", e)
     
-    #
     def login():
         school, client_username, client_password = ui()
         if school == "Harvey Mudd College":
             mudd_login(client_username, client_password)
         else:
-           purdue_login(client_username, client_password)
-            
-    #def login():
-    #    while True:
-    #        school, client_username, client_password = ui()
-    #        if school == "Harvey Mudd College":
-    #            mudd_login(client_username, client_password)
-    #            break  # Successful login, exit the loop
-    #        else:
-    #            purdue_login(client_username, client_password)
-    #            if 
-    #            break  # Successful login, exit the loop
-            
+            purdue_login(client_username, client_password)
 
     def assignmentElementToEvent(assignment, course, default_href):
         '''
@@ -138,8 +121,8 @@ def scraping():
         start_date = start_date_obj.strftime("%Y-%m-%d") + "T" + start_date_obj.strftime("%H:%M:%S") + start_date_obj.strftime("%z")[0:3] + ':' + start_date_obj.strftime("%z")[3:5]
 
         event = {
-            'summary': course,
-            'description': assignment_name + "\n" + assignment_href,
+            'summary': assignment_name,
+            'description': course + "\n" + assignment_href,
             'colorId': "7",
             'start': {
                 'dateTime': start_date,
