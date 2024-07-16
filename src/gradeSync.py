@@ -110,10 +110,10 @@ def setup_task_scheduler():
 	executable_path = sys.argv[0]
 	print(executable_path)
 	#run every hour
-	action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc hourly /mo 1 /f'
+	action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc minute /mo 1 /f /RL highest'
 	#run on start up
 	startUp_task_name = task_name + "Start"
-	action2 = f'schtasks /create /tn "{startUp_task_name}" /tr "{executable_path}" /sc onstart /f'
+	action2 = f'schtasks /create /tn "{startUp_task_name}" /tr "{executable_path}" /sc onstart /f /RL highest'
 	subprocess.run(action1, shell=False)
 	subprocess.run(action2, shell=False)
 

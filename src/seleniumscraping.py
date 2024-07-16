@@ -28,7 +28,7 @@ def scraping():
     
     temp_dir = tempfile.mkdtemp()
     chrome_options = webdriver.ChromeOptions()
-    # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    #chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument(f"--user-data-dir={temp_dir}")
@@ -69,7 +69,7 @@ def scraping():
             print("trying duo")
             duo()  
             print("looking for trust")
-            trust = WebDriverWait(driver, 30).until(
+            trust = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
             )
             print("ok found it")
@@ -83,6 +83,18 @@ def scraping():
             mudd_login(client_username, client_password)
         else:
             purdue_login(client_username, client_password)
+            
+    #def login():
+    #    while True:
+    #        school, client_username, client_password = ui()
+    #        if school == "Harvey Mudd College":
+    #            mudd_login(client_username, client_password)
+    #            break  # Successful login, exit the loop
+    #        else:
+    #            purdue_login(client_username, client_password)
+    #            if 
+    #            break  # Successful login, exit the loop
+            
 
     def assignmentElementToEvent(assignment, course, default_href):
         '''

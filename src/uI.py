@@ -22,8 +22,8 @@ def ui():
 
         # Store values in the global dictionary
         entry_values = {"school": school, "username": username, "password": password}
-
-        # Destroy the root window
+        
+        #Remove the loggin UI
         root.destroy()
 
     # Autocomplete functionality for the Combobox
@@ -86,16 +86,21 @@ def ui():
     forgot_password_link = tk.Label(root, text="I login using \"School Credentials\" on Gradescope. What do I do?", cursor="hand1", font=("Arial", 10), underline=True)
     forgot_password_link.pack(pady=5)
 
-    # Function to handle forgot password
-    def forgot_password():
+    # Function to direct Users to the SSO Account Setup page
+    def sso_setup():
         # Open the website link in a web browser
         webbrowser.open("https://gradesynccalendar.xyz/src/web/account.html")
 
-    # Bind the forgot password link to the function
-    forgot_password_link.bind("<Button-1>", lambda e: forgot_password())
-
+    # Bind the SSO Account Setup page link to the function
+    forgot_password_link.bind("<Button-1>", lambda e: sso_setup())
+    
+    #create the loggin button and functionality
     login_button = tk.Button(root, text="Login", command=pop_up)
     login_button.pack(pady=20)
+    
+    # Bind the Enter key to the login button
+    root.bind('<Return>', lambda event: 
+        login_button.invoke())
 
     # Run the application
     root.mainloop()
@@ -107,21 +112,20 @@ def ui():
     
     return(school, username, password)
 
+#pushes a Message to a User
+def message(title,text):
+    root = tk.Tk()
+    root.withdraw()
+    root.update()
+    messagebox.showinfo(title, text)
+    root.update()
+    root.destroy()
+    root.mainloop()
+
 #Notifies the User of a Duo popup when logging in with their HMC account
 def duo():
-    root = tk.Tk()
-    root.withdraw()
-    root.update()
-    messagebox.showinfo("Duo Authentication", "Check for a Duo push")
-    root.update()
-    root.destroy()
-    root.mainloop()
-    
+    message("Duo Authentication", "Check for a Duo push")
+
+#Incorrect login Notice
 def incorrect_login():
-    root = tk.Tk()
-    root.withdraw()
-    root.update()
-    messagebox.showinfo("Incorrect Login", "Your Password and/or Username was incorrect.")
-    root.update()
-    root.destroy()
-    root.mainloop()
+    message("Incorrect Login", "Your Password and/or Username was incorrect.")
