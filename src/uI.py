@@ -8,6 +8,10 @@ from io import BytesIO
 
 entry_values = {}
 
+#logger
+import logging
+logger = logging.getLogger(__name__)
+
 def ui():
     # Function to handle login
     def pop_up():
@@ -51,7 +55,7 @@ def ui():
         logo_label.pack(pady=10)
         root.iconphoto(True, logo_photo)
     except Exception as e:
-        print(f"Logo loading error: {e}")
+        logging.info(f"Logo loading error: {e}")
 
     # Style customization
     style = ttk.Style()

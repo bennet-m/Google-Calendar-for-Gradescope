@@ -9,19 +9,46 @@ from secrets import config
 import os.path
 import sys
 import subprocess
-from macPath import get_path
+from macPath import *
+
+#logger
+import logging
+logger = logging.getLogger(__name__)
+
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
+
+
 
 def main():
 	"""Shows basic usage of the Google Calendar API.
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
+	#windows folder path
+	Win_folder_path = get_WinPath() / "GradeSync"  # Replace with your desired folder path
+
+	#temporary need to make an installer
+	if not os.path.exists(Win_folder_path):
+		os.makedirs(Win_folder_path)
+		logger.info(f"Folder created at {Win_folder_path}")
+	else:
+		print(f"Folder already exists at {Win_folder_path}")
+ 
+ 
+	print("setting up Logger")
+	if sys.platform in ["Linux", "darwin"]:
+		logger_path = get_path() / "GradeSync.log"
+	else:
+		logger_path = Win_folder_path / "GradeSync.log"
+	
+ 	#Setup Global Logger
+	logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO)
+ 
 	creds = None
 	#Define the token path for the google calendar api
 	if sys.platform in ["Linux", "darwin"]:
 		token_path = get_path() / "token.json"
 	else:
-		token_path = "token.json"
+		token_path = Win_folder_path / "token.json"
 
 	# The file token.json stores the user's access and refresh tokens, and is
 	# created automatically when the authorization flow completes for the first
@@ -31,7 +58,7 @@ def main():
 	# If there are no (valid) token available, let the user log in.
 	if not creds or not creds.valid:
 		if creds and creds.expired and creds.refresh_token:
-			print("Refreshing token")
+			logger.info("Refreshing token")
 			creds.refresh(Request())
 		else:
 			client_config = config
@@ -43,7 +70,7 @@ def main():
 
 	try:
 		service = build("calendar", "v3", credentials=creds)
-		print("running")
+		logger.info("running")
 		# Check if the Gradescope calendar exists, if not create it
 		page_token = None
 		grade_scope_cal_exists = False
@@ -72,17 +99,17 @@ def main():
 		# Delete each event
 		for event in events:
 			service.events().delete(calendarId=id, eventId=event['id']).execute()
-			print(f"Event {event['summary']} deleted.")
+			logger.info(f"Event {event['summary']} deleted.")
 
 		# Call scraping function to get events and insert them into the calendar
 		events = scraping()
 		for event in events:
 			if event:
 				event = service.events().insert(calendarId=id, body=event).execute()
-				print('Event created: %s' % (event.get('htmlLink')))
-    # print("Not actually making events")
+				logger.info('Event created: %s' % (event.get('htmlLink')))
+    # logger.info("Not actually making events")
 	except HttpError as error:
-		print(f"An error occurred: {error}")
+		logger.info(f"An error occurred: {error}")
 
 #Scheduler
 def get_self_path():
@@ -100,15 +127,15 @@ def setup_cronjob():
 
 	if cron_job not in current_cron_jobs:
 		os.system(f'(crontab -l; echo "{cron_job}") | crontab -')
-		print("Cron job added.")
+		logger.info("Cron job added.")
 	else:
-		print("Cron job already exists.")
+		logger.info("Cron job already exists.")
 
 #Windows scheduler
 def setup_task_scheduler():
 	task_name = "GradescopeCalendar"
 	executable_path = sys.argv[0]
-	print(executable_path)
+	logger.info(executable_path)
 	#run every hour
 	action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc minute /mo 1 /f /RL highest'
 	#run on start up

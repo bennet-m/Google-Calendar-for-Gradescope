@@ -16,7 +16,11 @@ import os
 import tempfile
 import sys
 from pathlib import Path
-from macPath import get_path
+from macPath import *
+
+#logger
+import logging
+logger = logging.getLogger(__name__)
 
 def scraping():
     """
@@ -39,20 +43,20 @@ def scraping():
     
     ##DEFINE FUNCTIONS##
     def purdue_login(client_username, client_password):
-        print("going to Purdue login page")
+        logger.info("going to Purdue login page")
         driver.get("https://www.gradescope.com/login")
         # Find the username and password fields once page loads sufficiently
         username = WebDriverWait(driver, 500).until(
             EC.element_to_be_clickable((By.ID, "session_email"))  
         )
         password = driver.find_element(By.ID, "session_password")
-        print("logging in", client_username, client_password)
+        logger.info("logging in", client_username, client_password)
         username.send_keys(client_username)
         password.send_keys(client_password)
         password.send_keys(Keys.RETURN)
             
     def mudd_login(client_username, client_password):
-        print("going to mudd_login page")
+        logger.info("going to mudd_login page")
         driver.get("https://www.gradescope.com/auth/saml/hmc")
         # Find the username and password fields once page loads sufficiently
         username = WebDriverWait(driver, 500).until(
@@ -66,35 +70,54 @@ def scraping():
         password.send_keys(Keys.RETURN)
             
         try:
-            print("trying duo")
+            logger.info("trying duo")
             duo()  
-            print("looking for trust")
+            logger.info("looking for trust")
             trust = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
             )
-            print("ok found it")
+            logger.info("ok found it")
             trust.click()
         except Error as e:
-            print("oops missed it", e)
+            logger.info("oops missed it", e)
     
+    #No loop login
+    # def login():
+    #     school, client_username, client_password = ui()
+    #     if school == "Harvey Mudd College":
+    #         mudd_login(client_username, client_password)
+    #     else:
+    #         purdue_login(client_username, client_password)
+    
+    #login Loop   
     def login():
-        school, client_username, client_password = ui()
-        if school == "Harvey Mudd College":
-            mudd_login(client_username, client_password)
-        else:
-            purdue_login(client_username, client_password)
-            
-    #def login():
-    #    while True:
-    #        school, client_username, client_password = ui()
-    #        if school == "Harvey Mudd College":
-    #            mudd_login(client_username, client_password)
-    #            break  # Successful login, exit the loop
-    #        else:
-    #            purdue_login(client_username, client_password)
-    #            if 
-    #            break  # Successful login, exit the loop
-            
+        while True:
+            school, client_username, client_password = ui()
+            if school == "Harvey Mudd College":
+                mudd_login(client_username, client_password)
+                try:
+                    logger.info("testing to see if password is right")
+                    driver.find_element(By.CLASS_NAME, "courseList--term")
+                    
+                    logger.info("Correct User Loggin")
+                    break
+                except:
+                    #Notify user of incorrect information
+                    incorrect_login()
+                    logger.info("Incorrect User Info")
+                    
+            else:
+                purdue_login(client_username, client_password)
+                try:
+                    logger.info("testing to see if password is right")
+                    driver.find_element(By.CLASS_NAME, "courseList--term")
+                    
+                    logger.info("Correct User Loggin")
+                    break
+                except:
+                    #Notify user of incorrect information
+                    incorrect_login()
+                    logger.info("Incorrect User Info")
 
     def assignmentElementToEvent(assignment, course, default_href):
         '''
@@ -115,12 +138,12 @@ def scraping():
             assignment_href = assignment_primary.find_element(By.TAG_NAME, "a").get_attribute("href")
         except:
             assignment_href = default_href
-        print("link should be", assignment_href)
+        logger.info("link should be", assignment_href)
         #get the assignmentDue Date
         try:
             due_date_element = assignment.find_element(By.CLASS_NAME, "submissionTimeChart--dueDate")
         except:
-            print("there's no due date for assignment {assignment}")
+            logger.info("there's no due date for assignment {assignment}")
             return
         due_date_unformatted = due_date_element.get_attribute("datetime")
 
@@ -146,7 +169,7 @@ def scraping():
                 'useDefault': True,
             },
         }
-        print("event is", event)
+        logger.info("event is", event)
         return event
     
     def has_no_submission(assignment):
@@ -182,11 +205,11 @@ def scraping():
 
         #Create a list of individual assingment elements
         assignments = assignment_grouped.find_elements(By.TAG_NAME, "tr")
-        print("Scraping Assignments on Course Page") 
+        logger.info("Scraping Assignments on Course Page") 
 
         #filter for assignments with No submissions
         assignments = filter(lambda assignment: has_no_submission(assignment), assignments)
-        print("assignments filtered out now are ", assignments)
+        logger.info("assignments filtered out now are ", assignments)
 
 
         #Scrape data from each assignment and organize it
@@ -196,19 +219,20 @@ def scraping():
     ##PROGRAM##
     if sys.platform in ["Linux", "darwin"]:
         cookie_path = get_path() / "cookies.pkl"
-        # token_path = "../__file__"
-    else:
-        cookie_path = "cookies.pkl"
+    else: #windows
+        Win_folder_path = get_WinPath() / "GradeSync"
+        cookie_path = Win_folder_path / "cookies.pkl"
+        
     # Load cookies if they exist
     if os.path.exists(cookie_path):
-        print("Cookies exist, going to gradescope")
+        logger.info("Cookies exist, going to gradescope")
         # If you have cookies, go to the gradescope, load cookies, refresh and you should be logged in
         driver.get("https://www.gradescope.com")
 
         cookies = pickle.load(open(cookie_path, "rb"))
         for cookie in cookies:
             driver.add_cookie(cookie)
-        print("refreshing")
+        logger.info("refreshing")
         driver.refresh()  
         
         #Check if you loaded into gradescope successfully
@@ -216,20 +240,20 @@ def scraping():
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
             )
-            print("we in gradescope")
+            logger.info("we in gradescope")
             
         except TimeoutException:
-            print("Need to mudd_login")
+            logger.info("Need to mudd_login")
             
             login()
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
             )
-            print("Homepage Loaded")   
+            logger.info("Homepage Loaded")   
 
     #no cookies need to log in        
     else:
-        print("No cookies found, going to login ")
+        logger.info("No cookies found, going to login ")
         login()
     
     # Save cookies to a file (For DuoPush)
@@ -237,7 +261,7 @@ def scraping():
                 EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
             )
     pickle.dump(driver.get_cookies(), open(cookie_path, "wb"))
-    print("Cookies Saved")
+    logger.info("Cookies Saved")
 
     #Search for the first course list and make sure it is not an instructor course list
     if not ("Instructor Courses" in driver.find_element(By.ID, "account-show" ).text):
@@ -249,21 +273,21 @@ def scraping():
         courseLists = driver.find_elements(By.CLASS_NAME,'courseList')
         courseList = courseLists[1].find_element(By.CLASS_NAME,'courseList--coursesForTerm')
 
-    print("courseList is", courseList)
+    logger.info("courseList is", courseList)
 
     #Find all course boxes in the student course list
     courses = courseList.find_elements(By.CLASS_NAME, 'courseBox')
 
     #extract the course links from the course boxes
-    print("courses are", courses)
+    logger.info("courses are", courses)
     course_urls = [elem.get_attribute("href") for elem in courses]
 
     #Create an event dictionary for each course
     data = []
     for href in course_urls:
-        print("course href is", href)
+        logger.info("course href is", href)
         if href:
             data.extend(assignment_scrape(href))
         
-    print("FINAL OUTPUT YAY", data)
+    logger.info("FINAL OUTPUT YAY", data)
     return data

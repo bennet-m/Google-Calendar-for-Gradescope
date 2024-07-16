@@ -7,3 +7,8 @@ def get_path():
     # Create the directory if it doesn't exist
     path.mkdir(parents=True, exist_ok=True)  
     return path
+
+def get_WinPath():
+    home_dir = Path.home()
+    path = home_dir / "AppData" / "Local"
+    return path
