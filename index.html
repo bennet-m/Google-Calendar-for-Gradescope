@@ -140,10 +140,15 @@
             <h1>How to set it up (Windows)</h1>
             <ol>
                 <li><a href="dist/GradeSyncWin.zip">Download here</a></li>
-                <li>Extract the downloaded file and run the executable inside.</li>
+                <li>Extract the downloaded file and run the executable inside as administrator.</li>
                 <li>Sign in to your Google account when prompted</li>
                 <li>Sign into your Gradescope account when prompted. If you usually log in with "School Credentials" and don't go to Harvey Mudd, go <a href="src/web/account.html"> here</a> enable logging in to Gradescope with email and password. </li>
             </ol>
+            <p style="text-align: left;">Administrator privledge is only needed to ensure your calendar updates automatically; it will not accsess your data.</p>
+            <p style="text-align: left;">You may also choose to not give Admin privledges but you will need run the executable manually to update your calendar. (<a href="src/web/privacy.html"></a>).</p>
+            <p style="text-align: left;">(<a href="src/web/privacy.html" Privacy Policy></a>).</p>
+
+            
             Done! Your Gradescope assignments will now be synced to your Google Calendar.
         </div>
     </div>
@@ -182,7 +187,7 @@
             document.getElementById('mac-download').style.display = 'none';
             document.getElementById('mac-instructions').style.display = 'none';
         } else {
-            console.log("Operating system not recognized")
+            console.log("Operating system not supported")
         }
     });
 </script>
