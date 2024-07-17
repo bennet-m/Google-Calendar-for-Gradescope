@@ -15,6 +15,8 @@ from macPath import *
 import logging
 logger = logging.getLogger(__name__)
 
+from elevate import elevate
+
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
@@ -23,17 +25,19 @@ def main():
 	"""Shows basic usage of the Google Calendar API.
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
-	#windows folder path
+	#windows setup
 	Win_folder_path = get_WinPath() / "GradeSync"  # Replace with your desired folder path
 
-	print("setting up Logger")
+	print("setting up Logger and envoking UAC/AppleScript")
 	if sys.platform in ["Linux", "darwin"]:
 		logger_path = get_path() / "GradeSync.log"
+		#elevate(graphical=False) #Mac Admin elevation
 	else:
 		logger_path = Win_folder_path / "GradeSync.log"
+		elevate(show_console=False) # Windows UAC Elevation
 	
  	#Setup Global Logger
-	logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO)
+	logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO, filemode ='w')
 
 	creds = None
 	#Define the token path for the google calendar api
@@ -129,7 +133,7 @@ def setup_task_scheduler():
 	executable_path = sys.argv[0]
 	logger.info(executable_path)
 	#run every hour
-	action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc minute /mo 1 /f /RL highest'
+	action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc minute /mo 30 /f /RL highest'
 	#run on start up
 	startUp_task_name = task_name + "Start"
 	action2 = f'schtasks /create /tn "{startUp_task_name}" /tr "{executable_path}" /sc onstart /f /RL highest'
