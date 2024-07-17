@@ -26,15 +26,6 @@ def main():
 	#windows folder path
 	Win_folder_path = get_WinPath() / "GradeSync"  # Replace with your desired folder path
 
-	#temporary need to make an installer
-	if sys.platform == "win32":
-		if not os.path.exists(Win_folder_path):
-			os.makedirs(Win_folder_path)
-			logger.info(f"Folder created at {Win_folder_path}")
-		else:
-			print(f"Folder already exists at {Win_folder_path}")
- 
- 
 	print("setting up Logger")
 	if sys.platform in ["Linux", "darwin"]:
 		logger_path = get_path() / "GradeSync.log"
@@ -43,7 +34,7 @@ def main():
 	
  	#Setup Global Logger
 	logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO)
- 
+
 	creds = None
 	#Define the token path for the google calendar api
 	if sys.platform in ["Linux", "darwin"]:
