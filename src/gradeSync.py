@@ -149,4 +149,8 @@ if __name__ == "__main__":
 		setup_cronjob()
 	elif sys.platform == "win32":
 		setup_task_scheduler()
-	main()
+	try:
+		main()
+	except Exception as e:
+            logger.info("Failed!", e)
+            print("Failed!", e)
