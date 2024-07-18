@@ -38,7 +38,11 @@ def scraping():
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument(f"--user-data-dir={temp_dir}")
     #Create Web Driver
-    service = ChromeService()
+    try:
+        service = ChromeService()
+    except:
+        service = ChromeService(service=service, options=chrome_options)
+        
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.delete_all_cookies()
     
