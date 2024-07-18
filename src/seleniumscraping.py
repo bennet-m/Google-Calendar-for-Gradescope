@@ -33,7 +33,7 @@ def scraping():
     
     temp_dir = tempfile.mkdtemp()
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    #chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument(f"--user-data-dir={temp_dir}")
@@ -60,7 +60,7 @@ def scraping():
         logger.info("going to mudd_login page")
         driver.get("https://www.gradescope.com/auth/saml/hmc")
         # Find the username and password fields once page loads sufficiently
-        username = WebDriverWait(driver, 500).until(
+        username = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.ID, "identification"))  
         )
         password = driver.find_element(By.ID, "ember533") 
@@ -82,22 +82,37 @@ def scraping():
         except Error as e:
             logger.info("oops missed it", e)
     
-    #login Loop   
-    def login():
+        def login():
         while True:
             school, client_username, client_password = get_login()
             if school == "Harvey Mudd College":
                 mudd_login(client_username, client_password)
+                #
+                
+                logger.info("testing to see if Mudd password is right")
+                logger.info("trying duo")
+                
                 try:
-                    logger.info("testing to see if password is right")
-                    driver.find_element(By.CLASS_NAME, "courseList--term")
-                    
-                    logger.info("Correct User Loggin")
-                    break
-                except:
+                    error = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.CLASS_NAME, "cs-error"))  
+                    )
                     #Notify user of incorrect information
                     incorrect_login()
                     logger.info("Incorrect User Info")
+                    
+                except:
+                    #notify user of duo push
+                    duo()
+                    
+                    logger.info("looking for trust")
+                    trust = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
+                    )
+                    logger.info("ok found it")
+                    
+                    trust.click()
+                    logger.info("Correct User Loggin")
+                    break
                     
             else:
                 purdue_login(client_username, client_password)
