@@ -33,12 +33,12 @@ def scraping():
     
     temp_dir = tempfile.mkdtemp()
     chrome_options = webdriver.ChromeOptions()
-    #chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument(f"--user-data-dir={temp_dir}")
     #Create Web Driver
-    service = ChromeService(executable_path=ChromeDriverManager().install())
+    service = ChromeService()
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.delete_all_cookies()
     

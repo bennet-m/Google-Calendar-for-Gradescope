@@ -109,5 +109,5 @@ if __name__ == "__main__":
 	try:
 		main()
 	except Exception as e:
-            logger.info("Failed!", e)
-            print("Failed!", e)
+		logger.error("Failed! %s", e)
+		print("Failed!", e)
