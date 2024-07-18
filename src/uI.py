@@ -120,7 +120,7 @@ def get_email_password(school):
 
     root.mainloop()
 
-def get_admin_permission():
+def admin_permission():
     def finish_setup():
         entry_values["admin"] = admin_var.get()
         root.destroy()
@@ -153,6 +153,10 @@ def get_admin_permission():
     finish_button.pack(pady=10)
 
     root.mainloop()
+
+def get_admin_permission():
+    admin_permission()
+    return entry_values.get("admin") == 1
 
 def get_login():
     get_school()
