@@ -37,14 +37,17 @@ def scraping():
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument(f"--user-data-dir={temp_dir}")
-    #Create Web Driver
-    try:
+    
+    #Create Web Driver      
+    try:    
         service = ChromeService()
-    except:
-        service = ChromeService(service=service, options=chrome_options)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
         
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    driver.delete_all_cookies()
+    except:
+        service = ChromeService(executable_path=ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+    driver.delete_all_cookies()   
     
     ##DEFINE FUNCTIONS##
     def purdue_login(client_username, client_password):
