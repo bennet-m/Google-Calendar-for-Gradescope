@@ -11,6 +11,8 @@ import sys
 from macPath import *
 from scheduling import set_up_scheduler
 
+from elevate import elevate
+
 #logger
 import logging
 logger = logging.getLogger(__name__)
