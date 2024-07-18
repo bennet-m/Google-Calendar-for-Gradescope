@@ -87,13 +87,9 @@ def scraping():
             school, client_username, client_password = get_login()
             if school == "Harvey Mudd College":
                 mudd_login(client_username, client_password)
-                #
-                
-                logger.info("testing to see if Mudd password is right")
-                logger.info("trying duo")
-                
                 try:
-                    error = WebDriverWait(driver, 10).until(
+                    logger.info("testing to see if Mudd password is right")
+                    WebDriverWait(driver, 10).until(
                         EC.presence_of_element_located((By.CLASS_NAME, "cs-error"))  
                     )
                     #Notify user of incorrect information
@@ -101,9 +97,9 @@ def scraping():
                     logger.info("Incorrect User Info")
                     
                 except:
+                    logger.info("trying duo")
                     #notify user of duo push
-                    duo()
-                    
+                    duo() 
                     logger.info("looking for trust")
                     trust = WebDriverWait(driver, 10).until(
                         EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
