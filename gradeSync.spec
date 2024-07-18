@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['src\\gradeSync.py'],
+    ['src/gradeSync.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -11,7 +11,7 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    noarchive=True,
     optimize=0,
 )
 pyz = PYZ(a.pure)
@@ -21,9 +21,9 @@ exe = EXE(
     a.scripts,
     a.binaries,
     a.datas,
-    [],
-    name='GradeSync',
-    debug=False,
+    [('v', None, 'OPTION')],
+    name='gradeSync',
+    debug=True,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
@@ -35,5 +35,11 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['images\\logo.png'],
+    icon=['images/logo.icns'],
+)
+app = BUNDLE(
+    exe,
+    name='gradeSync.app',
+    icon='images/logo.icns',
+    bundle_identifier=None,
 )

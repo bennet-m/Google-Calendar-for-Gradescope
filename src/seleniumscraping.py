@@ -44,6 +44,7 @@ def scraping():
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
     except:
+        logger.info("ChromeDriverManager not working")
         service = ChromeService(executable_path=ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
