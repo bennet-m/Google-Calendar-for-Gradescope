@@ -12,38 +12,18 @@ entry_values = {}
 import logging
 logger = logging.getLogger(__name__)
 
-def ui():
-    # Function to handle login
-    def pop_up():
-        global entry_values
+def get_school():
+    def next_screen():
         school = school_var.get()
-        username = username_entry.get()
-        password = password_entry.get()
-
-        if not school or not username or not password:
-            messagebox.showerror("Input Error", "All fields are required.")
+        if not school:
+            messagebox.showerror("Input Error", "Please select a school.")
             return
-
-        # Store values in the global dictionary
-        entry_values = {"school": school, "username": username, "password": password}
-        
-        #Remove the loggin UI
+        entry_values["school"] = school
         root.destroy()
 
-    # Autocomplete functionality for the Combobox
-    def on_keyrelease(event):
-        value = event.widget.get()
-        if value == '':
-            school_dropdown['values'] = schools
-        else:
-            data = [item for item in schools if value.lower() in item.lower()]
-            school_dropdown['values'] = data
-        school_dropdown.event_generate('<<ComboboxSelected>>')
-
-    # Create the main window
     root = tk.Tk()
-    root.title("Gradescope Google Calendar Integration")
-    root.geometry("400x450")
+    root.title("GradeSync - Select School")
+    root.geometry("600x450")
 
     # Load and set logo image
     try:
@@ -57,68 +37,128 @@ def ui():
     except Exception as e:
         logging.info(f"Logo loading error: {e}")
 
-    # Style customization
-    style = ttk.Style()
-    style.configure('TCombobox', foreground='black', background='white', fieldbackground='white')
+    header = tk.Label(root, text="Welcome to GradeSync!", font=("Helvetica", 16))
+    header.pack(pady=10)
+    instructions = tk.Label(root, text="We'll need the login info you use for Gradescope to connect to your account.", font=("Helvetica", 16))
+    instructions.pack(pady=10)
 
-    # Dropdown for school selection
     school_var = tk.StringVar()
     schools = ["Harvey Mudd College", "Other (all schools are supported)"]
 
     school_label = tk.Label(root, text="Select Your School:")
     school_label.pack(pady=5)
 
-    school_dropdown = ttk.Combobox(root, textvariable=school_var, style='TCombobox')
-    school_dropdown['values'] = schools
+    school_dropdown = ttk.Combobox(root, textvariable=school_var, values=schools)
     school_dropdown.pack(pady=5)
-    school_dropdown.bind('<KeyRelease>', on_keyrelease)
 
-    # Textbox for username
-    username_label = tk.Label(root, text="Gradescope account email:")
-    username_label.pack(pady=5)
+    next_button = tk.Button(root, text="Next", command=next_screen)
+    next_button.pack(pady=20)
 
-    username_entry = tk.Entry(root)
-    username_entry.pack(pady=5)
-
-    # Textbox for password
-    password_label = tk.Label(root, text="Gradescope password:")
-    password_label.pack(pady=5)
-
-    password_entry = tk.Entry(root, show="*")
-    password_entry.pack(pady=5)
-    
-    admin = tk.IntVar()
-    schedule_check = tk.Checkbutton(root, text = "Automate (Requires Admin Privileges)", variable=admin, onvalue=1, offvalue=0)
-    schedule_check.pack(pady = 5)
-
-    forgot_password_link = tk.Label(root, text="I login using \"School Credentials\" on Gradescope. What do I do?", cursor="hand1", font=("Arial", 10), underline=True)
-    forgot_password_link.pack(pady=5)
-
-    # Function to direct Users to the SSO Account Setup page
-    def sso_setup():
-        # Open the website link in a web browser
-        webbrowser.open("https://gradesynccalendar.xyz/src/web/account.html")
-
-    # Bind the SSO Account Setup page link to the function
-    forgot_password_link.bind("<Button-1>", lambda e: sso_setup())
-    
-    #create the loggin button and functionality
-    login_button = tk.Button(root, text="Login", command=pop_up)
-    login_button.pack(pady=20)
-    
-    # Bind the Enter key to the login button
-    root.bind('<Return>', lambda event: 
-        login_button.invoke())
-
-    # Run the application
     root.mainloop()
 
-    # Retrieve the entry values after the main loop is terminated
+def get_email_password(school):
+    def next_screen():
+        username = username_entry.get()
+        password = password_entry.get()
+        if not username or not password:
+            messagebox.showerror("Input Error", "Email and Password are required.")
+            return
+        entry_values["username"] = username
+        entry_values["password"] = password
+        root.destroy()
+
+    root = tk.Tk()
+    root.title("GradeSync - Login")
+    root.geometry("400x450")
+
+    # Load and set logo image
+    try:
+        image_data = base64.b64decode(logo)
+        logo_image = Image.open(BytesIO(image_data))
+        logo_image = logo_image.resize((100, 100), Image.LANCZOS)
+        logo_photo = ImageTk.PhotoImage(logo_image)
+        logo_label = tk.Label(root, image=logo_photo)
+        logo_label.pack(pady=10)
+        root.iconphoto(True, logo_photo)
+    except Exception as e:
+        logging.info(f"Logo loading error: {e}")
+    if school == "Other (all schools are supported)":
+        username_label = tk.Label(root, text="Gradescope account email:")
+        username_label.pack(pady=5)
+
+        username_entry = tk.Entry(root)
+        username_entry.pack(pady=5)
+
+        password_label = tk.Label(root, text="Gradescope password:")
+        password_label.pack(pady=5)
+
+        password_entry = tk.Entry(root, show="*")
+        password_entry.pack(pady=5)
+
+        forgot_password_link = tk.Label(root, text="I login using \"School Credentials\" on Gradescope. What do I do?", cursor="hand1", underline=True)
+        forgot_password_link.pack(pady=5)
+
+        def sso_setup():
+            webbrowser.open("https://gradesynccalendar.xyz/src/web/account.html")
+
+        forgot_password_link.bind("<Button-1>", lambda e: sso_setup())
+    else:
+        username_label = tk.Label(root, text="Mudd username:")
+        username_label.pack(pady=5)
+
+        username_entry = tk.Entry(root)
+        username_entry.pack(pady=5)
+
+        password_label = tk.Label(root, text="Mudd password:")
+        password_label.pack(pady=5)
+
+        password_entry = tk.Entry(root, show="*")
+        password_entry.pack(pady=5)
+
+    next_button = tk.Button(root, text="Next", command=next_screen)
+    next_button.pack(pady=20)
+
+    root.mainloop()
+
+def get_admin_permission():
+    def finish_setup():
+        entry_values["admin"] = admin_var.get()
+        root.destroy()
+
+    root = tk.Tk()
+    root.title("GradeSync - Admin Access")
+    root.geometry("400x400")
+
+    # Load and set logo image
+    try:
+        image_data = base64.b64decode(logo)
+        logo_image = Image.open(BytesIO(image_data))
+        logo_image = logo_image.resize((100, 100), Image.LANCZOS)
+        logo_photo = ImageTk.PhotoImage(logo_image)
+        logo_label = tk.Label(root, image=logo_photo)
+        logo_label.pack(pady=10)
+        root.iconphoto(True, logo_photo)
+    except Exception as e:
+        logging.info(f"Logo loading error: {e}")
+    finish = tk.Label(root, text="Finished! Your calendar should be updated.")
+    finish.pack(pady=10)
+    question = tk.Label(root, text="Would you like GradeSync to run periodically in the background of your computer? This will help you stay updated on your classes.", wraplength=350)
+    question.pack(pady=10)
+
+    admin_var = tk.IntVar()
+    admin_checkbox = tk.Checkbutton(root, text="Yes. I will accept the popup asking for admin access.", variable=admin_var)
+    admin_checkbox.pack(pady=10)
+
+    finish_button = tk.Button(root, text="Finish", command=finish_setup)
+    finish_button.pack(pady=10)
+
+    root.mainloop()
+
+def get_login():
+    get_school()
     school = entry_values.get("school")
-    username = entry_values.get("username")
-    password = entry_values.get("password")
-    
-    return(school, username, password)
+    get_email_password(school)
+    return entry_values.get("school"), entry_values.get("username"), entry_values.get("password")
 
 #pushes a Message to a User
 def message(title,text):

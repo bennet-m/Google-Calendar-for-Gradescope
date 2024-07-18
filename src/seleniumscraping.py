@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
 from datetime import datetime, timedelta
 from uI import *
+from scheduling import *
 import pickle
 import os
 import tempfile
@@ -68,10 +69,22 @@ def scraping():
         username.send_keys(client_username)
         password.send_keys(client_password)
         password.send_keys(Keys.RETURN)
+            
+        try:
+            logger.info("trying duo")
+            duo()  
+            logger.info("looking for trust")
+            trust = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
+            )
+            logger.info("ok found it")
+            trust.click()
+        except Error as e:
+            logger.info("oops missed it", e)
     
     def login():
         while True:
-            school, client_username, client_password = ui()
+            school, client_username, client_password = get_login()
             if school == "Harvey Mudd College":
                 mudd_login(client_username, client_password)
                 try:
@@ -224,7 +237,7 @@ def scraping():
         for cookie in cookies:
             driver.add_cookie(cookie)
         logger.info("refreshing")
-        driver.refresh()  
+        driver.refresh()
         
         #Check if you loaded into gradescope successfully
         try:
