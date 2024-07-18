@@ -3,6 +3,7 @@ import subprocess
 import os
 import logging
 from uI import get_admin_permission
+from elevate import elevate
 logger = logging.getLogger(__name__)
 
 #Scheduler
@@ -49,3 +50,6 @@ def set_up_scheduler():
             setup_task_scheduler()
         else:
             logger.info("Scheduler not supported on this platform.")
+            
+def request_win_admin():
+    elevate(show_console=False) # Windows UAC Elevation

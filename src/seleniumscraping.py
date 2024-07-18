@@ -69,18 +69,6 @@ def scraping():
         username.send_keys(client_username)
         password.send_keys(client_password)
         password.send_keys(Keys.RETURN)
-            
-        try:
-            logger.info("trying duo")
-            duo()  
-            logger.info("looking for trust")
-            trust = WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
-            )
-            logger.info("ok found it")
-            trust.click()
-        except Error as e:
-            logger.info("oops missed it", e)
     
     def login():
         while True:

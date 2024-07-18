@@ -11,7 +11,7 @@ import sys
 from macPath import *
 from scheduling import set_up_scheduler
 
-from elevate import elevate
+
 
 #logger
 import logging
@@ -31,7 +31,6 @@ def main():
 		logger_path = get_path() / "GradeSync.log"
 	else:
 		logger_path = Win_folder_path / "GradeSync.log"
-		elevate(show_console=False) # Windows UAC Elevation
 	
  	#Setup Global Logger
 	logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO, filemode ='w')
