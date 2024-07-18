@@ -76,7 +76,7 @@ def main():
 			page_token = calendar_list.get('nextPageToken')
 			if not page_token:
 				break
-
+		#
 		if not grade_scope_cal_exists:
 			calendar = {
 				'summary': 'Gradescope Assignments',
