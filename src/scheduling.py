@@ -3,7 +3,7 @@ import subprocess
 import os
 import logging
 from uI import get_admin_permission
-from elevate import elevate
+
 logger = logging.getLogger(__name__)
 
 #Scheduler
@@ -30,6 +30,8 @@ def setup_cronjob():
 
 #Windows scheduler
 def setup_task_scheduler():
+    from elevate import elevate
+    elevate.show_console = False
     task_name = "GradescopeCalendar"
     executable_path = sys.argv[0]
     logger.info(executable_path)
@@ -50,6 +52,3 @@ def set_up_scheduler():
             setup_task_scheduler()
         else:
             logger.info("Scheduler not supported on this platform.")
-            
-def request_win_admin():
-    elevate(show_console=False) # Windows UAC Elevation

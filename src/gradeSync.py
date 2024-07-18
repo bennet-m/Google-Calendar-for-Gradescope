@@ -11,12 +11,9 @@ import sys
 from macPath import *
 from scheduling import set_up_scheduler
 
-
-
 #logger
 import logging
 logger = logging.getLogger(__name__)
-
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 def main():
@@ -32,7 +29,7 @@ def main():
 	else:
 		logger_path = Win_folder_path / "GradeSync.log"
 	
- 	#Setup Global Logger
+	#Setup Global Logger
 	logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO, filemode ='w')
 
 	creds = None
@@ -45,8 +42,11 @@ def main():
 	# The file token.json stores the user's access and refresh tokens, and is
 	# created automatically when the authorization flow completes for the first
 	# time.
+	first_time = True
 	if os.path.exists(token_path):
 		creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+		first_time = False
+
 	# If there are no (valid) token available, let the user log in.
 	if not creds or not creds.valid:
 		if creds and creds.expired and creds.refresh_token:
@@ -99,10 +99,11 @@ def main():
 			if event:
 				event = service.events().insert(calendarId=id, body=event).execute()
 				logger.info('Event created: %s' % (event.get('htmlLink')))
-
-		set_up_scheduler()
-    # logger.info("Not actually making events")
-	except HttpError as error:
+		
+		print("done addding stuff")
+		if first_time:
+			set_up_scheduler()
+	except Exception as error:
 		logger.info(f"An error occurred: {error}")
 
 
