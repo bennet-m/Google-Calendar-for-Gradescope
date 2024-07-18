@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
 from datetime import datetime, timedelta
 from uI import *
+from scheduling import *
 import pickle
 import os
 import tempfile
@@ -81,18 +82,10 @@ def scraping():
         except Error as e:
             logger.info("oops missed it", e)
     
-    #No loop login
-    # def login():
-    #     school, client_username, client_password = ui()
-    #     if school == "Harvey Mudd College":
-    #         mudd_login(client_username, client_password)
-    #     else:
-    #         purdue_login(client_username, client_password)
-    
     #login Loop   
     def login():
         while True:
-            school, client_username, client_password = ui()
+            school, client_username, client_password = get_login()
             if school == "Harvey Mudd College":
                 mudd_login(client_username, client_password)
                 try:
@@ -233,7 +226,7 @@ def scraping():
         for cookie in cookies:
             driver.add_cookie(cookie)
         logger.info("refreshing")
-        driver.refresh()  
+        driver.refresh()
         
         #Check if you loaded into gradescope successfully
         try:
