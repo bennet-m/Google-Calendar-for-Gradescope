@@ -82,7 +82,7 @@ def scraping():
         except Error as e:
             logger.info("oops missed it", e)
     
-        def login():
+    def login():
         while True:
             school, client_username, client_password = get_login()
             if school == "Harvey Mudd College":
