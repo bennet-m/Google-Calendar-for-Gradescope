@@ -14,7 +14,7 @@ from scheduling import set_up_scheduler
 #logger
 import logging
 logger = logging.getLogger(__name__)
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
+SCOPES = ["https://www.googleapis.com/auth/calendar.app.created", "https://www.googleapis.com/auth/calendar.calendarlist.readonly"]
 
 def main():
 	"""Shows basic usage of the Google Calendar API.
