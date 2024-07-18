@@ -33,7 +33,7 @@ def scraping():
     
     temp_dir = tempfile.mkdtemp()
     chrome_options = webdriver.ChromeOptions()
-    # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument(f"--user-data-dir={temp_dir}")
@@ -44,20 +44,20 @@ def scraping():
     
     ##DEFINE FUNCTIONS##
     def purdue_login(client_username, client_password):
-        logger.info("going to Purdue login page")
+        print("going to Purdue login page")
         driver.get("https://www.gradescope.com/login")
         # Find the username and password fields once page loads sufficiently
         username = WebDriverWait(driver, 500).until(
             EC.element_to_be_clickable((By.ID, "session_email"))  
         )
         password = driver.find_element(By.ID, "session_password")
-        logger.info("logging in", client_username, client_password)
+        print("logging in", client_username, client_password)
         username.send_keys(client_username)
         password.send_keys(client_password)
         password.send_keys(Keys.RETURN)
             
     def mudd_login(client_username, client_password):
-        logger.info("going to mudd_login page")
+        print("going to mudd_login page")
         driver.get("https://www.gradescope.com/auth/saml/hmc")
         # Find the username and password fields once page loads sufficiently
         username = WebDriverWait(driver, 5).until(
@@ -76,40 +76,40 @@ def scraping():
             if school == "Harvey Mudd College":
                 mudd_login(client_username, client_password)
                 try:
-                    logger.info("testing to see if Mudd password is right")
+                    print("testing to see if Mudd password is right")
                     WebDriverWait(driver, 10).until(
                         EC.presence_of_element_located((By.CLASS_NAME, "cs-error"))  
                     )
                     #Notify user of incorrect information
                     incorrect_login()
-                    logger.info("Incorrect User Info")
+                    print("Incorrect User Info")
                     
                 except:
-                    logger.info("trying duo")
+                    print("trying duo")
                     #notify user of duo push
                     duo() 
-                    logger.info("looking for trust")
+                    print("looking for trust")
                     trust = WebDriverWait(driver, 10).until(
                         EC.element_to_be_clickable((By.ID, "trust-browser-button"))  
                     )
-                    logger.info("ok found it")
+                    print("ok found it")
                     
                     trust.click()
-                    logger.info("Correct User Loggin")
+                    print("Correct User Loggin")
                     break
                     
             else:
                 purdue_login(client_username, client_password)
                 try:
-                    logger.info("testing to see if password is right")
+                    print("testing to see if password is right")
                     driver.find_element(By.CLASS_NAME, "courseList--term")
                     
-                    logger.info("Correct User Loggin")
+                    print("Correct User Loggin")
                     break
                 except:
                     #Notify user of incorrect information
                     incorrect_login()
-                    logger.info("Incorrect User Info")
+                    print("Incorrect User Info")
 
     def assignmentElementToEvent(assignment, course, default_href):
         '''
@@ -130,12 +130,11 @@ def scraping():
             assignment_href = assignment_primary.find_element(By.TAG_NAME, "a").get_attribute("href")
         except:
             assignment_href = default_href
-        logger.info("link should be", assignment_href)
         #get the assignmentDue Date
         try:
             due_date_element = assignment.find_element(By.CLASS_NAME, "submissionTimeChart--dueDate")
         except:
-            logger.info("there's no due date for assignment {assignment}")
+            print("there's no due date for assignment {assignment}")
             return
         due_date_unformatted = due_date_element.get_attribute("datetime")
 
@@ -161,7 +160,7 @@ def scraping():
                 'useDefault': True,
             },
         }
-        logger.info("event is", event)
+        print("event is", event)
         return event
     
     def has_no_submission(assignment):
@@ -197,11 +196,11 @@ def scraping():
 
         #Create a list of individual assingment elements
         assignments = assignment_grouped.find_elements(By.TAG_NAME, "tr")
-        logger.info("Scraping Assignments on Course Page") 
+        print("Scraping Assignments on Course Page") 
 
         #filter for assignments with No submissions
         assignments = filter(lambda assignment: has_no_submission(assignment), assignments)
-        logger.info("assignments filtered out now are ", assignments)
+        print("assignments filtered out now are ", assignments)
 
 
         #Scrape data from each assignment and organize it
@@ -217,14 +216,14 @@ def scraping():
         
     # Load cookies if they exist
     if os.path.exists(cookie_path):
-        logger.info("Cookies exist, going to gradescope")
+        print("Cookies exist, going to gradescope")
         # If you have cookies, go to the gradescope, load cookies, refresh and you should be logged in
         driver.get("https://www.gradescope.com")
 
         cookies = pickle.load(open(cookie_path, "rb"))
         for cookie in cookies:
             driver.add_cookie(cookie)
-        logger.info("refreshing")
+        print("refreshing")
         driver.refresh()
         
         #Check if you loaded into gradescope successfully
@@ -232,28 +231,28 @@ def scraping():
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
             )
-            logger.info("we in gradescope")
+            print("we in gradescope")
             
         except TimeoutException:
-            logger.info("Need to mudd_login")
+            print("Need to mudd_login")
             
             login()
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
             )
-            logger.info("Homepage Loaded")   
+            print("Homepage Loaded")   
 
     #no cookies need to log in        
     else:
-        logger.info("No cookies found, going to login ")
+        print("No cookies found, going to login ")
         login()
     
     # Save cookies to a file (For DuoPush)
     WebDriverWait(driver, 500).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
-            )
+        EC.presence_of_element_located((By.CLASS_NAME, "courseList--term"))
+    )
     pickle.dump(driver.get_cookies(), open(cookie_path, "wb"))
-    logger.info("Cookies Saved")
+    print("Cookies Saved")
 
     #Search for the first course list and make sure it is not an instructor course list
     if not ("Instructor Courses" in driver.find_element(By.ID, "account-show" ).text):
@@ -265,21 +264,20 @@ def scraping():
         courseLists = driver.find_elements(By.CLASS_NAME,'courseList')
         courseList = courseLists[1].find_element(By.CLASS_NAME,'courseList--coursesForTerm')
 
-    logger.info("courseList is", courseList)
+    print("courseList is", courseList)
 
     #Find all course boxes in the student course list
     courses = courseList.find_elements(By.CLASS_NAME, 'courseBox')
 
     #extract the course links from the course boxes
-    logger.info("courses are", courses)
+    print("courses are", courses)
     course_urls = [elem.get_attribute("href") for elem in courses]
 
     #Create an event dictionary for each course
     data = []
     for href in course_urls:
-        logger.info("course href is", href)
         if href:
             data.extend(assignment_scrape(href))
         
-    logger.info("FINAL OUTPUT YAY", data)
+    print("FINAL OUTPUT YAY", data)
     return data
