@@ -86,6 +86,10 @@ def ui():
 
     password_entry = tk.Entry(root, show="*")
     password_entry.pack(pady=5)
+    
+    admin = tk.IntVar()
+    schedule_check = tk.Checkbutton(root, text = "Automate (Requires Admin Privileges)", variable=admin, onvalue=1, offvalue=0)
+    schedule_check.pack(pady = 5)
 
     forgot_password_link = tk.Label(root, text="I login using \"School Credentials\" on Gradescope. What do I do?", cursor="hand1", font=("Arial", 10), underline=True)
     forgot_password_link.pack(pady=5)
