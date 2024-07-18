@@ -8,7 +8,7 @@ def get_path():
     path.mkdir(parents=True, exist_ok=True)  
     return path
 
-def get_WinPath():
+def get_win_path():
     home_dir = Path.home()
     path = home_dir / "AppData" / "Local"
     if not os.path.exists(path):

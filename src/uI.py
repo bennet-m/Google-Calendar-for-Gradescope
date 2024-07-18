@@ -39,7 +39,7 @@ def get_school():
 
     header = tk.Label(root, text="Welcome to GradeSync!", font=("Helvetica", 16))
     header.pack(pady=10)
-    instructions = tk.Label(root, text="We'll need the login info you use for Gradescope to connect to your account.", font=("Helvetica", 16))
+    instructions = tk.Label(root, text="We'll need the login info you use for Gradescope to connect to your account.", font=("Helvetica", 12))
     instructions.pack(pady=10)
 
     school_var = tk.StringVar()
@@ -117,6 +117,9 @@ def get_email_password(school):
 
     next_button = tk.Button(root, text="Next", command=next_screen)
     next_button.pack(pady=20)
+    
+    root.bind('<Return>', lambda event: 
+        next_button.invoke())
 
     root.mainloop()
 

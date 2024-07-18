@@ -24,7 +24,7 @@ def main():
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
 	#windows setup
-	Win_folder_path = get_WinPath() / "GradeSync"  # Replace with your desired folder path
+	Win_folder_path = get_win_path() / "GradeSync"  # Replace with your desired folder path
 
 	print("setting up Logger and envoking UAC/AppleScript")
 	if sys.platform in ["Linux", "darwin"]:
@@ -101,6 +101,7 @@ def main():
 				logger.info('Event created: %s' % (event.get('htmlLink')))
 
 		set_up_scheduler()
+		
     # logger.info("Not actually making events")
 	except HttpError as error:
 		logger.info(f"An error occurred: {error}")
