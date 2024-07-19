@@ -10,6 +10,7 @@ import os.path
 import sys
 from macPath import *
 from scheduling import set_up_scheduler
+import io
 
 #logger
 import logging
@@ -27,6 +28,9 @@ def main():
 	if sys.platform in ["Linux", "darwin"]:
 		logger_path = get_path() / "GradeSync.log"
 	else:
+     	#Ensure libraries didn't set stdout NONE values for PyInstaller
+		buffer = io.StringIO()
+		sys.stdout = sys.stderr = buffer 
 		logger_path = Win_folder_path / "GradeSync.log"
 	
 	#Setup Global Logger
