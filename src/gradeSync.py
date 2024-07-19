@@ -29,18 +29,23 @@ def main():
 		logger_path = get_path() / "GradeSync.log"
 	else:
      	#Ensure libraries didn't set stdout NONE values for PyInstaller
-		buffer = io.StringIO()
-		sys.stdout = sys.stderr = buffer 
+		# buffer = io.StringIO()
+		# sys.stdout = sys.stderr = buffer 
+		print("logger path created")
 		logger_path = Win_folder_path / "GradeSync.log"
 	
 	#Setup Global Logger
-	logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO, filemode ='w')
+	try:
+		logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO, filemode ='w')
+	except Exception as e:
+		print("logger creation failed:", e)
 
 	creds = None
 	#Define the token path for the google calendar api
 	if sys.platform in ["Linux", "darwin"]:
 		token_path = get_path() / "token.json"
 	else:
+		print("token path created")
 		token_path = Win_folder_path / "token.json"
 
 	# The file token.json stores the user's access and refresh tokens, and is
