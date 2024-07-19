@@ -33,7 +33,7 @@ def setup_task_scheduler():
     from elevate import elevate
     elevate(show_console = False)
     task_name = "GradescopeCalendar"
-    executable_path = sys.argv[0]
+    executable_path = get_self_path
     logger.info(executable_path)
     #run every hour
     action1 = f'schtasks /create /tn "{task_name}" /tr "{executable_path}" /sc minute /mo 30 /f /RL highest'

@@ -4,7 +4,7 @@
 a = Analysis(
     ['src\\gradeSync.py'],
     pathex=[],
-    binaries=[('C:\\Users\\roman\\miniconda3\\envs\\scraping\\python311.dll', '.')],
+    binaries=[],
     datas=[],
     hiddenimports=[],
     hookspath=[],
