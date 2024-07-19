@@ -30,5 +30,3 @@ def get_win_path():
             return path
     except Exception as e:
         print(f"Failed to create directory {path}: {e}")
-    
-    
