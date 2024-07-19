@@ -14,13 +14,17 @@ def get_path():
     return path
 
 def get_win_path():
-    print("locating or creating app folder in .../AppData/Local")
+    print("Locating or creating app folder in .../AppData/Local")
     home_dir = Path.home()
-    path = home_dir / "AppData" / "Local"
-    if not os.path.exists(path):
-        mode = 0o666
-        os.makedirs(path, mode)
-    else:
-        logger.info(f"Folder already exists at {path}")
+    path = home_dir / "AppData" / "Local" / "GradeSync"  # Ensure the GradeSync folder is included
 
+    try:
+        if not os.path.exists(path):
+            print(f"Creating directory at {path}")
+            os.makedirs(path, mode=0o666)  # Create the directory with appropriate permissions
+        else:
+            logger.info(f"Folder already exists at {path}")
+    except Exception as e:
+        logger.error(f"Failed to create directory {path}: {e}")
+    
     return path
