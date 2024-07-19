@@ -2,16 +2,16 @@
 
 
 a = Analysis(
-    ['src/gradeSync.py'],
+    ['src\\gradeSync.py'],
     pathex=[],
-    binaries=[],
+    binaries=[('C:\\Users\\roman\\miniconda3\\envs\\scraping\\python311.dll', '.')],
     datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=True,
+    noarchive=False,
     optimize=0,
 )
 pyz = PYZ(a.pure)
@@ -21,9 +21,9 @@ exe = EXE(
     a.scripts,
     a.binaries,
     a.datas,
-    [('v', None, 'OPTION')],
-    name='gradeSync',
-    debug=True,
+    [],
+    name='GradeSync',
+    debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
@@ -35,11 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['images/logo.icns'],
-)
-app = BUNDLE(
-    exe,
-    name='gradeSync.app',
-    icon='images/logo.icns',
-    bundle_identifier=None,
+    icon=['images\\logo.png'],
 )

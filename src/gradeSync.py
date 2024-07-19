@@ -23,7 +23,7 @@ def main():
 	#windows setup
 	Win_folder_path = get_win_path() / "GradeSync"  # Replace with your desired folder path
 
-	print("setting up Logger and envoking UAC/AppleScript")
+	print("setting up Logger")
 	if sys.platform in ["Linux", "darwin"]:
 		logger_path = get_path() / "GradeSync.log"
 	else:
