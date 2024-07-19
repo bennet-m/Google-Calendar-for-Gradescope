@@ -22,9 +22,10 @@ def get_win_path():
         if not os.path.exists(path):
             print(f"Creating directory at {path}")
             os.makedirs(path, mode=0o666)  # Create the directory with appropriate permissions
+            print("Making directory")
         else:
-            logger.info(f"Folder already exists at {path}")
+            print(f"Folder already exists at {path}")
     except Exception as e:
-        logger.error(f"Failed to create directory {path}: {e}")
+        print(f"Failed to create directory {path}: {e}")
     
     return path
