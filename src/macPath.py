@@ -14,6 +14,7 @@ def get_path():
     return path
 
 def get_win_path():
+    print("locating or creating app folder in .../AppData/Local")
     home_dir = Path.home()
     path = home_dir / "AppData" / "Local"
     if not os.path.exists(path):
