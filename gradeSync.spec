@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['src/gradeSync.py'],
+    ['src\\gradeSync.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -11,7 +11,7 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=True,
+    noarchive=False,
     optimize=0,
 )
 pyz = PYZ(a.pure)
@@ -19,27 +19,27 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
-    [('v', None, 'OPTION')],
-    name='gradeSync',
-    debug=True,
+    [],
+    exclude_binaries=True,
+    name='GradeSync',
+    debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
-    console=False,
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['images/logo.icns'],
+    icon=['images\\logo.png'],
 )
-app = BUNDLE(
+coll = COLLECT(
     exe,
-    name='gradeSync.app',
-    icon='images/logo.icns',
-    bundle_identifier=None,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='GradeSync',
 )

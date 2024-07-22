@@ -10,6 +10,7 @@ import os.path
 import sys
 from macPath import *
 from scheduling import set_up_scheduler
+import io
 
 #logger
 import logging
@@ -21,22 +22,31 @@ def main():
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
 	#windows setup
-	Win_folder_path = get_win_path() / "GradeSync"  # Replace with your desired folder path
+	Win_folder_path = get_win_path()  # Replace with your desired folder path
 
-	print("setting up Logger and envoking UAC/AppleScript")
-	if sys.platform in ["Linux", "darwin"]:
-		logger_path = get_path() / "GradeSync.log"
-	else:
-		logger_path = Win_folder_path / "GradeSync.log"
+	print("setting up Logger")
+	try:
+		if sys.platform in ["Linux", "darwin"]:
+			logger_path = get_path() / "GradeSync.log"
+		else:
+			#Ensure libraries didn't set stdout NONE values for PyInstaller
+			# buffer = io.StringIO()
+			# sys.stdout = sys.stderr = buffer 
+			print("logger path created")
+			logger_path = Win_folder_path / "GradeSync.log"
 	
-	#Setup Global Logger
-	logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO, filemode ='w')
+		#Setup Global Logger
+		logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO, filemode ='w')
+	except Exception as e:
+		print("logger creation failed:", e)
 
 	creds = None
 	#Define the token path for the google calendar api
+	print("Setting up token path")
 	if sys.platform in ["Linux", "darwin"]:
 		token_path = get_path() / "token.json"
 	else:
+		print("token path created")
 		token_path = Win_folder_path / "token.json"
 
 	# The file token.json stores the user's access and refresh tokens, and is
