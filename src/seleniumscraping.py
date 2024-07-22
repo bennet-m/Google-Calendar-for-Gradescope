@@ -240,7 +240,7 @@ def scraping():
     if sys.platform in ["Linux", "darwin"]:
         cookie_path = get_path() / "cookies.pkl"
     else: #windows
-        Win_folder_path = get_win_path() / "GradeSync"
+        Win_folder_path = get_win_path()
         cookie_path = Win_folder_path / "cookies.pkl"
         
     # Load cookies if they exist
