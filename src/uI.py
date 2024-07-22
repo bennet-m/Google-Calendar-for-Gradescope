@@ -39,7 +39,7 @@ def get_school():
 
     header = tk.Label(root, text="Welcome to GradeSync!", font=("Helvetica", 16))
     header.pack(pady=10)
-    instructions = tk.Label(root, text="We'll need the login info you use for Gradescope to connect to your account.", font=("Helvetica", 12))
+    instructions = tk.Label(root, text="Please enter the login info you use for Gradescope so we can connect to your account.", font=("Helvetica", 12))
     instructions.pack(pady=10)
 
     school_var = tk.StringVar()
@@ -82,7 +82,7 @@ def get_email_password(school):
         root.iconphoto(True, logo_photo)
     except Exception as e:
         logging.info(f"Logo loading error: {e}")
-    if school == "Other (all schools are supported)":
+    if school != "Harvey Mudd College":
         username_label = tk.Label(root, text="Gradescope account email:")
         username_label.pack(pady=5)
 
@@ -94,13 +94,13 @@ def get_email_password(school):
 
         password_entry = tk.Entry(root, show="*")
         password_entry.pack(pady=5)
-
-        forgot_password_link = tk.Label(root, text="I login using \"School Credentials\" on Gradescope. What do I do?", cursor="hand1", underline=True)
+        forgot_password_link = tk.Label(root, text="I login using \"School Credentials\" on Gradescope. What do I do?", cursor="hand1", underline=True, fg="lightblue")
         forgot_password_link.pack(pady=5)
 
         def sso_setup():
             webbrowser.open("https://gradesynccalendar.xyz/src/web/account.html")
 
+        forgot_password_link.config(font=("Helvetica", 12, "underline"))
         forgot_password_link.bind("<Button-1>", lambda e: sso_setup())
     else:
         username_label = tk.Label(root, text="Mudd username:")
