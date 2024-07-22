@@ -18,6 +18,8 @@ import tempfile
 import sys
 from pathlib import Path
 from macPath import *
+import stat
+
 
 #logger
 import logging
@@ -30,27 +32,16 @@ def scraping():
     Returns:
         (arr): An array of event dictionaries formated for the google calendar api
     """
-    
-    temp_dir = tempfile.mkdtemp()
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-    chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
-    chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-    chrome_options.add_argument(f"--user-data-dir={temp_dir}")
-    
-    #Create Web Driver      
-    try:    
-        service = ChromeService()
-        driver = webdriver.Chrome(service=service, options=chrome_options)
         
-    except:
-        logger.info("ChromeDriverManager not working")
-        service = ChromeService(executable_path=ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        
-    driver.delete_all_cookies()   
-    
     ##DEFINE FUNCTIONS##
+    def make_executable(path):
+        # Change the file permissions to make it executable
+        st = os.stat(path)
+        os.chmod(path, st.st_mode | stat.S_IEXEC)
+
+    def is_executable(file_path):
+        # Check if the file is executable
+        return os.path.isfile(file_path) and os.access(file_path, os.X_OK)    
     def purdue_login(client_username, client_password):
         print("going to Purdue login page")
         driver.get("https://www.gradescope.com/login")
@@ -216,6 +207,36 @@ def scraping():
     
     
     ##PROGRAM##
+    temp_dir = tempfile.mkdtemp()
+    
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+    chrome_options.add_argument(f"--user-data-dir={temp_dir}")
+
+    #Create Web Driver      
+    try:    
+        service = ChromeService(executable_path=ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+    except Exception as e:
+        logger.info(f"ChromeDriverManager not working {e}")
+        executable_path = ChromeDriverManager().install()
+        if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
+            executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
+        logger.info(f"ChromeDriverManager, {executable_path}")
+
+        # Check if the executable_path leads to a document instead of an executable
+        if not is_executable(executable_path):
+            logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
+            make_executable(executable_path)
+
+        service = ChromeService(executable_path=executable_path)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    driver.delete_all_cookies()   
+
     if sys.platform in ["Linux", "darwin"]:
         cookie_path = get_path() / "cookies.pkl"
     else: #windows
@@ -264,7 +285,6 @@ def scraping():
 
     #Search for the first course list and make sure it is not an instructor course list
     if not ("Instructor Courses" in driver.find_element(By.ID, "account-show" ).text):
-        #If it is not an instructor course list then the first instance of the courseList is a student sourse list
         #find the student course list
         courseList = driver.find_element(By.CLASS_NAME,'courseList--coursesForTerm')
     else:
