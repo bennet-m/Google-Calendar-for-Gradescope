@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 from macPath import *
 import stat
-import chromedriver_autoinstaller
+#import chromedriver_autoinstaller
 import warnings
 import urllib3
 import certifi
