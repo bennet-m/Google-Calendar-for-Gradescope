@@ -1,3 +1,4 @@
+import shutil
 from webbrowser import Error
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -19,7 +20,12 @@ import sys
 from pathlib import Path
 from macPath import *
 import stat
-
+import chromedriver_autoinstaller
+import warnings
+import urllib3
+import certifi
+import urllib.request
+import ssl
 
 #logger
 import logging
@@ -213,14 +219,32 @@ def scraping():
     chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-    chrome_options.add_argument(f"--user-data-dir={temp_dir}")
+    # chrome_options.add_argument(f"--user-data-dir={temp_dir}")
+    # Find operating system's path to drivers/chromedriver
+    driver_path = shutil.which('chromedriver')
 
+    # Remove the folder and everything inside it if the path exists
+    if driver_path:
+        driver_folder = os.path.dirname(driver_path)
+        shutil.rmtree(driver_folder)
+    
     #Create Web Driver      
     try:    
-        service = ChromeService(executable_path=ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        def create_ssl_context():
+            context = ssl.create_default_context(cafile=certifi.where())
+            return context
+
+        def install_chromedriver():
+            # Create a custom opener with our SSL context
+            context = create_ssl_context()
+            opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=context))
+            urllib.request.install_opener(opener)
         
+        install_chromedriver()
+        driver = webdriver.Chrome(options=chrome_options)
+
     except Exception as e:
+        print("fancy new thing didn't work")
         logger.info(f"ChromeDriverManager not working {e}")
         executable_path = ChromeDriverManager().install()
         if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
