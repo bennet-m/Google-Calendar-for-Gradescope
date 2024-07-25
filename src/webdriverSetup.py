@@ -100,17 +100,19 @@ def chrome_driver_setup():
                             logger.info(f"ChromeDriver not working. Trying Chad Mac Path Method \n {e}")
                             install_path = get_path()
                             cache_manager=DriverCacheManager(install_path)
-                            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(cache_manager=cache_manager).install()))
+                            
+                            executable_path = ChromeDriverManager(cache_manager=cache_manager).install()
                             
                             # need to do this because it installs incorrectly sometimes
-                            executable_path = install_path
+                            
                             if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
                                 executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
                             logger.info(f"ChromeDriverManager, {executable_path}")
                             if not is_executable(executable_path):
                                 logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
                                 make_executable(executable_path)
-                            driver = webdriver.Chrome(options=chrome_options)
+                            
+                            driver = webdriver.Chrome(service=ChromeService(executable_path), options=chrome_options)
                             return driver
                 
 
