@@ -1,6 +1,5 @@
 import shutil
 from selenium import webdriver
-from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 import chromedriver_autoinstaller
@@ -11,6 +10,8 @@ import logging
 import os
 import sys
 import stat
+from webdriver_manager.core.driver_cache import DriverCacheManager
+from macPath import *
 
 logger = logging.getLogger(__name__)
 
@@ -78,17 +79,24 @@ def chrome_driver_setup():
                     driver = webdriver.Chrome(options=chrome_options)
                     return driver
                 except Exception as e:
-                    logger.info(f"ChromeDriver not working. trying ChromeDriverManager().install() \n {e}")
-                    executable_path = ChromeDriverManager().install()
-                    # need to do this because it installs incorrectly sometimes
-                    if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
-                        executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
-                    logger.info(f"ChromeDriverManager, {executable_path}")
-                    if not is_executable(executable_path):
-                        logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
-                        make_executable(executable_path)
-                    driver = webdriver.Chrome(options=chrome_options)
-                    return driver
+                    try:
+                        logger.info(f"ChromeDriver not working. trying ChromeDriverManager().install() \n {e}")
+                        executable_path = ChromeDriverManager().install()
+                        # need to do this because it installs incorrectly sometimes
+                        if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
+                            executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
+                        logger.info(f"ChromeDriverManager, {executable_path}")
+                        if not is_executable(executable_path):
+                            logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
+                            make_executable(executable_path)
+                        driver = webdriver.Chrome(options=chrome_options)
+                        return driver
+                    except Exception as e:
+                        logger.info(f"ChromeDriver not working. Trying Chad Mac Path Method \n {e}")
+                        install_path = get_path()
+                        cache_manager=DriverCacheManager(install_path)
+                        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(cache_manager=cache_manager).install()))
+                
 
 
 def bing_driver_setup():
