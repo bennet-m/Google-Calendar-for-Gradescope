@@ -96,6 +96,7 @@ def chrome_driver_setup():
                         install_path = get_path()
                         cache_manager=DriverCacheManager(install_path)
                         driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(cache_manager=cache_manager).install()))
+                        return driver
                 
 
 
