@@ -92,11 +92,16 @@ def chrome_driver_setup():
                         driver = webdriver.Chrome(options=chrome_options)
                         return driver
                     except Exception as e:
-                        logger.info(f"ChromeDriver not working. Trying Chad Mac Path Method \n {e}")
-                        install_path = get_path()
-                        cache_manager=DriverCacheManager(install_path)
-                        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(cache_manager=cache_manager).install()))
-                        return driver
+                        try:
+                            logger.info(f"ChromeDriver not working. Trying basic install \n {e}")
+                            driver = webdriver.Chrome()
+                            return driver
+                        except Exception as e:
+                            logger.info(f"ChromeDriver not working. Trying Chad Mac Path Method \n {e}")
+                            install_path = get_path()
+                            cache_manager=DriverCacheManager(install_path)
+                            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(cache_manager=cache_manager).install()))
+                            return driver
                 
 
 
