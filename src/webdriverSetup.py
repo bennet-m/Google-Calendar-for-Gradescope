@@ -93,7 +93,7 @@ def chrome_driver_setup():
                         return driver
                     except Exception as e:
                         try:
-                            logger.info(f"ChromeDriver not working. Trying basic install \n {e}")
+                            logger.info(f"ChromeDriver not working. Trying basic install for Selinium 4.11V \n {e}")
                             driver = webdriver.Chrome()
                             return driver
                         except Exception as e:
@@ -101,6 +101,16 @@ def chrome_driver_setup():
                             install_path = get_path()
                             cache_manager=DriverCacheManager(install_path)
                             driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(cache_manager=cache_manager).install()))
+                            
+                            # need to do this because it installs incorrectly sometimes
+                            executable_path = install_path
+                            if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
+                                executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
+                            logger.info(f"ChromeDriverManager, {executable_path}")
+                            if not is_executable(executable_path):
+                                logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
+                                make_executable(executable_path)
+                            driver = webdriver.Chrome(options=chrome_options)
                             return driver
                 
 
