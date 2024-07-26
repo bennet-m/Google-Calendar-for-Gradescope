@@ -44,16 +44,15 @@ def chrome_driver_setup():
     def is_executable(file_path):
         # Check if the file is executable
         return os.path.isfile(file_path) and os.access(file_path, os.X_OK)   
-        
-    def create_ssl_context():
-        context = ssl.create_default_context(cafile=certifi.where())
-        return context
 
-    def create_opener():
-        # Create a custom opener with our SSL context
-        context = create_ssl_context()
-        opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=context))
-        urllib.request.install_opener(opener)
+    def third_party_notice_correction(executable_path):
+        # need to do this because it installs incorrectly sometimes
+        if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
+            executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
+        logger.info(f"ChromeDriverManager, {executable_path}")
+        if not is_executable(executable_path):
+            logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
+            make_executable(executable_path)
     
 
     # I know this is disgusting. Please blame ChromeDriver and Pyinstaller with MacOS because they don't work well together
@@ -64,7 +63,7 @@ def chrome_driver_setup():
     except Exception as e:
         try: 
             logger.info(f"Error. Attempting other default chrome webdriver setup: \n {e}")
-            service = ChromeService()
+            service = ChromeService(ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
         except Exception as e:
             try: 
@@ -72,50 +71,39 @@ def chrome_driver_setup():
                 chromedriver_autoinstaller.install()
                 driver = webdriver.Chrome()
                 return driver
+                
             except Exception as e:
                 try:
-                    logger.info(f"Error. Attempting opener thing: \n {e}")
-                    create_opener()
+                    logger.info(f"ChromeDriver not working. trying ChromeDriverManager().install() \n {e}")
+                    executable_path = ChromeDriverManager().install()
+                    third_party_notice_correction(executable_path)
                     driver = webdriver.Chrome(options=chrome_options)
                     return driver
+                
                 except Exception as e:
                     try:
-                        logger.info(f"ChromeDriver not working. trying ChromeDriverManager().install() \n {e}")
-                        executable_path = ChromeDriverManager().install()
-                        # need to do this because it installs incorrectly sometimes
-                        if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
-                            executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
-                        logger.info(f"ChromeDriverManager, {executable_path}")
-                        if not is_executable(executable_path):
-                            logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
-                            make_executable(executable_path)
-                        driver = webdriver.Chrome(options=chrome_options)
+                        logger.info(f"ChromeDriver not working. Trying basic install for Selinium 4.11V \n {e}")
+                        driver = webdriver.Chrome()
                         return driver
+                
                     except Exception as e:
                         try:
-                            logger.info(f"ChromeDriver not working. Trying basic install for Selinium 4.11V \n {e}")
-                            driver = webdriver.Chrome()
-                            return driver
-                        except Exception as e:
+                            #Mac needs the apps resources to be in a specific location for .app applications
                             logger.info(f"ChromeDriver not working. Trying Chad Mac Path Method \n {e}")
                             install_path = get_path()
+                            
+                            #Using Cache manager to specify path to be in the Mac Resource Path
                             cache_manager=DriverCacheManager(install_path)
                             
                             executable_path = ChromeDriverManager(cache_manager=cache_manager).install()
                             
-                            # need to do this because it installs incorrectly sometimes
-                            
-                            if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
-                                executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
-                            logger.info(f"ChromeDriverManager, {executable_path}")
-                            if not is_executable(executable_path):
-                                logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
-                                make_executable(executable_path)
+                            third_party_notice_correction(executable_path)
                             
                             driver = webdriver.Chrome(service=ChromeService(executable_path), options=chrome_options)
                             return driver
-                
-
+                            
+                        except Exception as e:
+                            logger.info(f"All Driver Initialization Attempts Failed \n {e}")
 
 def bing_driver_setup():
     try:
@@ -125,7 +113,7 @@ def bing_driver_setup():
         
         #options
         options = webdriver.EdgeOptions()
-        #options.add_argument("--headless=new")
+        options.add_argument("--headless=new")
         
         #create driver
         service = EdgeService(EdgeChromiumDriverManager().install())
