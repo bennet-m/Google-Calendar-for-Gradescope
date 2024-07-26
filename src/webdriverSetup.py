@@ -2,7 +2,6 @@ import shutil
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
-import chromedriver_autoinstaller
 import certifi
 import urllib.request
 import ssl
@@ -17,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 def get_driver():
     if sys.platform in ["Linux", "darwin"]:
+        import chromedriver_autoinstaller
         try:
             return chrome_driver_setup()
         except Exception as e:
@@ -127,3 +127,4 @@ def bing_driver_setup():
         logger.info(f"Trying Chrome")
         
         return chrome_driver_setup()
+
