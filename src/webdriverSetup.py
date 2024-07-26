@@ -58,6 +58,7 @@ def chrome_driver_setup():
     # I know this is disgusting. Please blame ChromeDriver and Pyinstaller with MacOS because they don't work well together
     try:      
         print("Attempting default chrome webdriver setup")
+        logger.info("Attempting default chrome webdriver setup")
         driver = webdriver.Chrome(options=chrome_options)
         return driver
     except Exception as e:
