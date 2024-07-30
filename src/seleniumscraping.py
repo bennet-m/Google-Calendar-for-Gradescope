@@ -211,7 +211,7 @@ def scraping():
     
     #creates the and assigns the appropriate driver
     driver = get_driver()
-
+    logger.info(f"Driver Created {driver}")
     driver.delete_all_cookies()   
 
     if sys.platform in ["Linux", "darwin"]:

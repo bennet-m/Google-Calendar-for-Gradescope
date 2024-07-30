@@ -15,25 +15,20 @@ import io
 #logger
 import logging
 logger = logging.getLogger(__name__)
-SCOPES = ["https://www.googleapis.com/auth/calendar.app.created", "https://www.googleapis.com/auth/calendar.calendarlist.readonly"]
 
 def main():
+	SCOPES = ["https://www.googleapis.com/auth/calendar.app.created", "https://www.googleapis.com/auth/calendar.calendarlist.readonly"]
 	"""Shows basic usage of the Google Calendar API.
 	Prints the start and name of the next 10 events on the user's calendar.
 	"""
-	#windows setup
-	Win_folder_path = get_win_path()
 
 	print("setting up Logger")
 	try:
 		if sys.platform in ["Linux", "darwin"]:
 			logger_path = get_path() / "GradeSync.log"
 		else:
-			#Ensure libraries didn't set stdout NONE values for PyInstaller
-			# buffer = io.StringIO()
-			# sys.stdout = sys.stderr = buffer 
 			print("logger path created")
-			logger_path = Win_folder_path / "GradeSync.log"
+			logger_path = get_win_path() / "GradeSync.log"
 	
 		#Setup Global Logger
 		logging.basicConfig(filename=logger_path, encoding='utf-8', level=logging.INFO, filemode ='w')
@@ -47,7 +42,7 @@ def main():
 		token_path = get_path() / "token.json"
 	else:
 		print("token path created")
-		token_path = Win_folder_path / "token.json"
+		token_path = get_win_path() / "token.json"
 
 	# The file token.json stores the user's access and refresh tokens, and is
 	# created automatically when the authorization flow completes for the first
@@ -121,5 +116,5 @@ if __name__ == "__main__":
 	try:
 		main()
 	except Exception as e:
-		logger.error("Failed! %s", e)
 		print("Failed!", e)
+		logger.error("Failed! %s", e)

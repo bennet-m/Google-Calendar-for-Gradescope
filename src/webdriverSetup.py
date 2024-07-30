@@ -17,7 +17,7 @@ def get_driver():
         try:
             return chrome_driver_setup()
         except Exception as e:
-            logger.info(f"Tried everything and it's not working. Now attempting to remove driver and reinstall. \n {e}")
+            logger.info(f"{e} \n \n Tried everything and it's not working. Now attempting to remove driver and reinstall. \n")
             driver_path = shutil.which('chromedriver')
             # Remove the folder and everything inside it if the path exists
             if driver_path:
@@ -48,7 +48,7 @@ def chrome_driver_setup():
             executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
         logger.info(f"ChromeDriverManager, {executable_path}")
         if not is_executable(executable_path):
-            logger.warning(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
+            logger.info(f"The file at {executable_path} is not executable. Attempting to fix permissions.")
             make_executable(executable_path)
     
     # I know this is disgusting. Please blame ChromeDriver and Pyinstaller with MacOS because they don't work well together
@@ -61,42 +61,47 @@ def chrome_driver_setup():
         cache_manager=DriverCacheManager(install_path)
         
         executable_path = ChromeDriverManager(cache_manager=cache_manager).install()
-        
+        if executable_path.endswith("THIRD_PARTY_NOTICES.chromedriver"):
+            executable_path = executable_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
+        logger.info(f"ChromeDriverManager before correction, {executable_path}")
         third_party_notice_correction(executable_path)
+        logger.info(f"ChromeDriverManager after correction, {executable_path}")
+
         
         driver = webdriver.Chrome(service=ChromeService(executable_path), options=chrome_options)
         return driver
     except Exception as e:
         try: 
-            logger.info(f"Error. Attempting default chrome webdriver setup \n {e}")
+            logger.info(f"{e} \n \n Error. Attempting default chrome webdriver setup \n")
             driver = webdriver.Chrome(options=chrome_options)
             return driver
         except Exception as e: 
             try: 
-                logger.info(f"Error. Attempting other default chrome webdriver setup: \n {e}")
+                logger.info(f"{e} \n \n Error. Attempting other default chrome webdriver setup: \n")
                 service = ChromeService(ChromeDriverManager().install())
                 driver = webdriver.Chrome(service=service, options=chrome_options)
+                return driver
             except Exception as e:
                 try: 
-                    logger.info(f"Error. Attempting autoinstaller: \n {e}")
+                    logger.info(f"{e} \n \n Error. Attempting autoinstaller: \n")
                     chromedriver_autoinstaller.install()
                     driver = webdriver.Chrome()
                     return driver
                 except Exception as e:
                     try:
-                        logger.info(f"ChromeDriver not working. trying ChromeDriverManager().install() \n {e}")
+                        logger.info(f"{e} \n \n ChromeDriver not working. trying ChromeDriverManager().install() \n")
                         executable_path = ChromeDriverManager().install()
                         third_party_notice_correction(executable_path)
                         driver = webdriver.Chrome(options=chrome_options)
                         return driver
                     except Exception as e:
                         try:
-                            logger.info(f"ChromeDriver not working. Trying basic install for Selinium 4.11V \n {e}")
+                            logger.info(f"{e} \n \n ChromeDriver not working. Trying basic install for Selinium 4.11V \n")
                             driver = webdriver.Chrome()
                             return driver
                         except Exception as e:
                             try:
-                                logger.info(f"Erm Maybe Bing on Mac will work????... \n {e}")
+                                logger.info(f"{e} \n \n Erm Maybe Bing on Mac will work????... \n")
                                 #windows browser (idk at this point MAC blows, in the bad way)
                                 from webdriver_manager.microsoft import EdgeChromiumDriverManager
                                 from selenium.webdriver.edge.service import Service as EdgeService
@@ -112,12 +117,12 @@ def chrome_driver_setup():
                                 return driver
                             except Exception as e:
                                 try:
-                                    logger.info(f"trying chromedriver_py... \n {e}")
+                                    logger.info(f"{e} \n \n trying chromedriver_py... \n")
                                     from chromedriver_py import binary_path # this will get you the path variable
                                     svc = webdriver.ChromeService(executable_path=binary_path)
                                     driver = webdriver.Chrome(service=svc)           
                                 except Exception as e:
-                                    logger.info(f"All Driver Initialization Attempts Failed \n {e}")
+                                    logger.info(f"{e} \n \n All Driver Initialization Attempts Failed \n")
 
 def bing_driver_setup():
     try:
@@ -136,7 +141,7 @@ def bing_driver_setup():
         return driver
     
     except Exception as e:
-        logger.info(f"EdgeDriverManager not working {e}")
+        logger.info(f"{e} \n \n EdgeDriverManager not worki\n")
         logger.info(f"Trying Chrome")
         
         return chrome_driver_setup()
