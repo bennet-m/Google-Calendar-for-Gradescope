@@ -95,7 +95,29 @@ def chrome_driver_setup():
                             driver = webdriver.Chrome()
                             return driver
                         except Exception as e:
-                            logger.info(f"All Driver Initialization Attempts Failed \n {e}")
+                            try:
+                                logger.info(f"Erm Maybe Bing on Mac will work????... \n {e}")
+                                #windows browser (idk at this point MAC blows, in the bad way)
+                                from webdriver_manager.microsoft import EdgeChromiumDriverManager
+                                from selenium.webdriver.edge.service import Service as EdgeService
+                                
+                                #options
+                                options = webdriver.EdgeOptions()
+                                options.add_argument("--headless=new")
+                                
+                                #create driver
+                                service = EdgeService(EdgeChromiumDriverManager().install())
+                                driver = webdriver.Edge(service = service, options=options)
+                                
+                                return driver
+                            except Exception as e:
+                                try:
+                                    logger.info(f"trying chromedriver_py... \n {e}")
+                                    from chromedriver_py import binary_path # this will get you the path variable
+                                    svc = webdriver.ChromeService(executable_path=binary_path)
+                                    driver = webdriver.Chrome(service=svc)           
+                                except Exception as e:
+                                    logger.info(f"All Driver Initialization Attempts Failed \n {e}")
 
 def bing_driver_setup():
     try:
