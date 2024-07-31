@@ -9,6 +9,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download Page</title>
+
+
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -118,6 +121,17 @@
         <a href="src/web/account.html">Logging in with "School Credentials"</a>
     </div>
     <br>
+
+    <div  id="mac-wrong-browser" class="container" style="margin-top: 70px" >
+        <h1 > For GradeSync to work, Chrome must be installed. </h1>
+        <p>
+            <a href="https://www.google.com/chrome/?brand=RXQR&ds_kid=43700052787082406&&msclkid=91ffb1910e4e1efe39f2d73897249e6f&utm_source=bing&utm_medium=cpc&utm_campaign=1707332%20%7C%20Chrome%20Win11%20%7C%20DR%20%7C%20ESS01%20%7C%20NA%20%7C%20US%20%7C%20en%20%7C%20Desk%20%7C%20SEM%20%7C%20BKWS%20-%20EXA%20%7C%20Txt%20%7C%20Bing&utm_term=download%20chrome&utm_content=Desk%20%7C%20BKWS%20-%20EXA%20%7C%20Txt_Download&gclid=91ffb1910e4e1efe39f2d73897249e6f&gclsrc=3p.ds"
+            >Download Here</a>
+        </p>
+
+    </div>
+
+    <br>
     <div class="container" style="margin-top: 70px" >
         <img src="images/logo.png" alt="Icon" style="width: 100px">
         <h1>Download GradeSync</h1>
@@ -140,8 +154,13 @@
         <div id="mac-instructions">
             <center>
             <h1>How to set it up (Mac)</h1>
+
             <ol>
-                <li><a id="mac-download" href="https://github.com/bennet-m/Google-Calendar-for-Gradescope/releases/download/v1.0.0/gradeSync.dmg">Download here</a></li>
+                <li id = "mac-wrong-browser-instructions">
+                    Ensure you <a  href ="https://www.google.com/chrome/?brand=RXQR&ds_kid=43700052787082406&&msclkid=91ffb1910e4e1efe39f2d73897249e6f&utm_source=bing&utm_medium=cpc&utm_campaign=1707332%20%7C%20Chrome%20Win11%20%7C%20DR%20%7C%20ESS01%20%7C%20NA%20%7C%20US%20%7C%20en%20%7C%20Desk%20%7C%20SEM%20%7C%20BKWS%20-%20EXA%20%7C%20Txt%20%7C%20Bing&utm_term=download%20chrome&utm_content=Desk%20%7C%20BKWS%20-%20EXA%20%7C%20Txt_Download&gclid=91ffb1910e4e1efe39f2d73897249e6f&gclsrc=3p.ds"> 
+                    Download Chrome  </a> 
+                </li>
+                <li><a id="mac-download" href="https://github.com/bennet-m/Google-Calendar-for-Gradescope/releases/download/v1.0.0/gradeSync.dmg">Download GradeSync</a></li>
                 <li style="padding: 10px">
                     <div style="display: flex; align-items: center;">
                         <p style="margin: 0; flex: 1; line-height: 1.5">
@@ -159,7 +178,7 @@
             <h1>How to set it up (Windows)</h1>
             <center>
             <ol>
-                <li><a href="https://github.com/bennet-m/Google-Calendar-for-Gradescope/releases/download/v1.0.0/GradeSync.exe">Download here</a></li>
+                <li><a href="https://github.com/bennet-m/Google-Calendar-for-Gradescope/releases/download/v1.0.0/GradeSync.exe">Download GradeSync</a></li>
                 <li>Run the executable. Note that you will recieve a prompt that prevents the program from running. To bypass this click on <b>More info</b> then <b>Run anyways</b></li>
                 <li>
                     <img src="images/WinConflict1.png" alt="Windows Warning1" style="width: 30%; height: auto"/>
@@ -195,16 +214,45 @@
         return os;
     }
 
+    function detectBrowser() {
+        var userAgent = navigator.userAgent;
+        console.log(userAgent)
+        var browserName;
+
+        if (userAgent.indexOf("Chrome") > -1) {
+            browserName = "Google Chrome";
+        } else if (userAgent.indexOf("Edge") > -1) {
+            browserName = "Microsoft Edge";
+        } else {
+            browserName = "Unknown Browser";
+        }
+
+        return browserName
+    }
+
     document.addEventListener('DOMContentLoaded', (event) => {
         let os = getOS();
 
-        if (os === 'Mac') {
+        let browser = detectBrowser();
+        console.log(browser)
+
+        if (os === 'Mac' && (browser == "Google Chrome" || browser == "Microsoft Edge")) {
             console.log("Operating system detected as Mac")
+            document.getElementById('mac-wrong-browser').style.display = 'none';
+            document.getElementById("mac-wrong-browser-instructions").style.display = 'none';
             document.getElementById('windows-download').style.display = 'none';
             document.getElementById('windows-instructions').style.display = 'none';
             document.getElementById('windows-instructions-button').style.display = 'none';
-        } else if (os === 'Windows') {
+        } else if(os === 'Mac' && browser == "Unknown Browser"){
+            console.log("Operating system detected as Mac not on a supported browser")
+            document.getElementById('windows-download').style.display = 'none';
+            document.getElementById('windows-instructions').style.display = 'none';
+            document.getElementById('windows-instructions-button').style.display = 'none';
+
+        }else if ( os == "Windows") {
             console.log("Operating system detected as Windows")
+            document.getElementById('mac-wrong-browser').style.display = 'none';
+            document.getElementById("mac-wrong-browser-instructions").style.display = 'none';
             document.getElementById('mac-download').style.display = 'none';
             document.getElementById('mac-instructions').style.display = 'none';
             document.getElementById('mac-instructions-button').style.display = 'none';
