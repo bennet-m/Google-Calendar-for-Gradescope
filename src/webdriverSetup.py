@@ -8,7 +8,7 @@ import sys
 import stat
 from webdriver_manager.core.driver_cache import DriverCacheManager
 from macPath import *
-import chromedriver_autoinstaller
+#import chromedriver_autoinstaller
 
 logger = logging.getLogger(__name__)
 

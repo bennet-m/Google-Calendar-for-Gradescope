@@ -75,15 +75,10 @@ def scraping():
             if school == "Harvey Mudd College":
                 mudd_login(client_username, client_password)
                 try:
-                    print("testing to see if Mudd password is right")
-                    WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located((By.CLASS_NAME, "cs-error"))  
-                    )
-                    #Notify user of incorrect information
-                    incorrect_login()
-                    print("Incorrect User Info")
+                    #check if the URL changed
+                    url = "https://www.gradescope.com/auth/saml/hmc"
+                    WebDriverWait(driver, 3).until(EC.url_changes(url))
                     
-                except:
                     print("trying duo")
                     #notify user of duo push
                     duo() 
@@ -96,6 +91,18 @@ def scraping():
                     trust.click()
                     print("Correct User Loggin")
                     break
+                    
+
+                    
+                except:
+                    print("testing to see if Mudd password is right")
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.CLASS_NAME, "cs-error"))  
+                    )
+                    #Notify user of incorrect information
+                    incorrect_login()
+                    print("Incorrect User Info")
+
                     
             else:
                 purdue_login(client_username, client_password)
