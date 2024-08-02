@@ -19,16 +19,13 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [('v', None, 'OPTION')],
+    exclude_binaries=True,
     name='gradeSync',
     debug=True,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
@@ -37,8 +34,17 @@ exe = EXE(
     entitlements_file=None,
     icon=['images/logo.icns'],
 )
-app = BUNDLE(
+coll = COLLECT(
     exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='gradeSync',
+)
+app = BUNDLE(
+    coll,
     name='gradeSync.app',
     icon='images/logo.icns',
     bundle_identifier=None,
